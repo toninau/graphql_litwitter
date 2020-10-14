@@ -1,8 +1,27 @@
-import { Arg, Resolver, Query, Int } from 'type-graphql';
+import { Arg, Resolver, Query, Int, FieldResolver, Root } from 'type-graphql';
+import { Message } from '../entity/Message';
 import { User } from '../entity/User';
 
-@Resolver()
+@Resolver(() => User)
 export class UserResolver {
+  @FieldResolver(() => Message)
+  async messages(
+    @Root() user: User,
+    @Arg('limit', () => Int, { nullable: true }) limit: number,
+    @Arg('offset', () => Int, { nullable: true }) offset: number
+  ): Promise<Message[] | undefined> {
+
+    const messages = await Message
+      .createQueryBuilder('message')
+      .offset(offset)
+      .limit(limit)
+      .leftJoinAndSelect('message.user', 'user')
+      .where('user.username = :username', { username: user.username })
+      .getMany();
+
+    return messages;
+  }
+
   @Query(() => User, { nullable: true })
   user(
     @Arg('id', () => Int, { nullable: true }) id: number,
@@ -26,5 +45,3 @@ export class UserResolver {
     return user;
   }
 }
-
-/*Messagesta field resolveri jolle paginointi */
