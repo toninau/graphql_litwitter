@@ -1,84 +1,74 @@
-import { ApolloServer } from 'apollo-server';
+import { ApolloServer } from 'apollo-server-express';
+import express from 'express';
 import 'reflect-metadata';
-import { createConnection } from 'typeorm';
-import { User } from './entity/User';
-import { Message } from './entity/Message';
 import { buildSchema } from 'type-graphql';
+import { createConnection } from 'typeorm';
+import cors from 'cors';
+
 import { MessageResolver } from './resolvers/messageResolver';
 import { UserResolver } from './resolvers/userResolver';
 
-createConnection().then(async connection => {
-  const user1 = new User();
-  user1.username = 'test1';
-  user1.password = 'test1';
-  await connection.manager.save(user1);
+import { User } from './entity/User';
+import { Message } from './entity/Message';
 
-  const user2 = new User();
-  user2.username = 'test2';
-  user2.password = 'test2';
-  await connection.manager.save(user2);
+const main = async () => {
+  await createConnection();
 
-  console.log('users has been saved');
+  /*Testing values*/
+  const user1 = User.create({
+    username: 'test1',
+    password: 'test1'
+  });
+  await User.save(user1);
 
-  //adding message from user to chat room
-  const message = new Message();
-  message.text = 'hello world';
-  message.user = user2;
-  await connection.manager.save(message);
+  const user2 = User.create({
+    username: 'test2',
+    password: 'test2'
+  });
+  await User.save(user2);
 
-  const message2 = new Message();
-  message2.text = 'hello world again';
-  message2.user = user2;
-  await connection.manager.save(message2);
+  const message = Message.create({
+    text: 'hello world',
+    user: user1
+  });
+  await Message.save(message);
 
-  const message3 = new Message();
-  message3.text = 'hello from user1';
-  message3.user = user1;
-  await connection.manager.save(message3);
+  const message2 = Message.create({
+    text: 'hello world again',
+    user: user2
+  });
+  await Message.save(message2);
 
-  const userRead = await User.findOne(1);
-  console.log(userRead);
+  const message3 = Message.create({
+    text: 'hello from user1',
+    user: user1
+  });
+  await Message.save(message3);
+  /*End of test values*/
 
-  const userWithMessages = await connection
-    .getRepository(User)
-    .createQueryBuilder('user')
-    .offset(0)  //alkupiste
-    .limit(5) //määrä
-    .select(['user.username', 'user.description'])
-    .where('user.username = :username', { username: 'test2' })
-    .leftJoinAndSelect('user.messages', 'message')
-    .getOne();
-  console.log(userWithMessages);
-  /*const messageRead = await Message.find({ user: user2 });
-  console.log(messageRead);*/
+  const app = express();
+  app.set('trust proxy', 1);
+  app.use(cors());
 
-  const messageRead = await Message.findOne(1);
-  console.log(messageRead);
-  console.log('all done');
-
-}).catch(error => console.log(error));
-
-//messagen user eager pois, vaihdetaan resolverissa, info typeorm
-
-void (async () => {
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [MessageResolver, UserResolver]
-    }),
-    context: ({ req, res }) => ({ req, res })
+      resolvers: [MessageResolver, UserResolver],
+      validate: false
+    })
   });
 
-  void apolloServer.listen();
-})();
+  apolloServer.applyMiddleware({
+    app,
+    cors: false
+  });
 
-/*
-const server = new ApolloServer({
-  typeDefs,
-  resolvers,
+  const PORT: string = process.env.PORT || '4000';
+
+  app.listen(PORT, () => {
+    console.log(`Server ready at ${PORT}`);
+  });
+};
+
+main().catch((err) => {
+  console.error(err);
 });
-
-server.listen().then(({ url }) => {
-  console.log(`🚀  Server ready at ${url}`);
-}).catch(e => {
-  console.log(e);
-});*/
