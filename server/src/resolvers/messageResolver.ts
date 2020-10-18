@@ -1,6 +1,7 @@
-import { Arg, Resolver, Query, Int, /* Mutation */ } from 'type-graphql';
+import { Arg, Resolver, Query, Int, Mutation, Ctx, UseMiddleware } from 'type-graphql';
 import { Message } from '../entity/Message';
-/* import { User } from '../entity/User'; */
+import { MyContext } from '../types';
+import { authChecker } from '../middleware/authChecker';
 
 @Resolver()
 export class MessageResolver {
@@ -23,15 +24,16 @@ export class MessageResolver {
     return messages;
   }
 
-  /* @Mutation(() => Message)
+  @Mutation(() => Message)
+  @UseMiddleware(authChecker)
   async addMessage(
     @Arg('message') messageInput: string,
-    @Arg('user') user : User
+    @Ctx() { currentUser }: MyContext
   ): Promise<Message> {
     const message = Message.create({
       text: messageInput,
-      user
+      user: currentUser
     });
     return await Message.save(message);
-  } */
+  }
 }

@@ -4,12 +4,24 @@ import 'reflect-metadata';
 import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
 import cors from 'cors';
+import { verify } from 'jsonwebtoken';
 
 import { MessageResolver } from './resolvers/messageResolver';
 import { UserResolver } from './resolvers/userResolver';
 
 import { User } from './entity/User';
 import { Message } from './entity/Message';
+
+export interface Session {
+  id: number;
+  dateCreated: number;
+  username: string;
+  issued: number;
+  expires: number;
+}
+
+const SECRET = process.env.SECRET || 'TEMP_VALUE';
+const PORT = process.env.PORT || '4000';
 
 const main = async () => {
   await createConnection();
@@ -54,7 +66,20 @@ const main = async () => {
     schema: await buildSchema({
       resolvers: [MessageResolver, UserResolver],
       validate: false
-    })
+    }),
+    context: async ({ req }) => {
+      const auth = req ? req.headers.authorization : null;
+      if (auth && auth.toLowerCase().startsWith('bearer ')) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const decodedToken: any = verify(
+          auth.substring(7), SECRET
+        );
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const currentUser = await User.findOne(decodedToken.id);
+        return { currentUser };
+      }
+      return null;
+    }
   });
 
   apolloServer.applyMiddleware({
@@ -62,9 +87,7 @@ const main = async () => {
     cors: false
   });
 
-  const PORT: string = process.env.PORT || '4000';
-
-  app.listen(PORT, () => {
+  app.listen(parseInt(PORT), () => {
     console.log(`Server ready at ${PORT}`);
   });
 };

@@ -11,6 +11,7 @@ import {
   ObjectType
 } from 'type-graphql';
 import argon2 from 'argon2';
+import { sign } from 'jsonwebtoken';
 
 import { Message } from '../entity/Message';
 import { User } from '../entity/User';
@@ -36,9 +37,11 @@ export class FieldError {
 class UserResponse {
   @Field(() => [FieldError], { nullable: true })
   errors?: FieldError[];
-  @Field(() => User, { nullable: true })
-  user?: User;
+  @Field(() => String, { nullable: true })
+  value?: string;
 }
+
+const SECRET = process.env.SECRET || 'TEMP_VALUE';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -108,7 +111,15 @@ export class UserResolver {
         }]
       };
     }
-    return { user };
+
+    const userForToken = {
+      username: user.username,
+      id: user.id
+    };
+
+    return {
+      value: sign(userForToken, SECRET)
+    };
   }
 
   @Mutation(() => UserResponse)
@@ -133,8 +144,14 @@ export class UserResolver {
         }]
       };
     }
+
+    const userForToken = {
+      username: user.username,
+      id: user.id
+    };
+
     return {
-      user
+      value: sign(userForToken, SECRET)
     };
   }
 }
