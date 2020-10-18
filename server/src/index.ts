@@ -12,14 +12,6 @@ import { UserResolver } from './resolvers/userResolver';
 import { User } from './entity/User';
 import { Message } from './entity/Message';
 
-export interface Session {
-  id: number;
-  dateCreated: number;
-  username: string;
-  issued: number;
-  expires: number;
-}
-
 const SECRET = process.env.SECRET || 'TEMP_VALUE';
 const PORT = process.env.PORT || '4000';
 

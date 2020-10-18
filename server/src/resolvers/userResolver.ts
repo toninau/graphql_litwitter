@@ -71,21 +71,6 @@ export class UserResolver {
     return id ? User.findOne(id) : User.findOne({ where: { username } });
   }
 
-  @Query(() => User)
-  async userWithMessages(
-    @Arg('username') username: string
-  ): Promise<User | undefined> {
-
-    const user = await User
-      .createQueryBuilder('user')
-      .select(['user.id', 'user.username', 'user.description'])
-      .leftJoinAndSelect('user.messages', 'message')
-      .where('user.username = :username', { username })
-      .getOne();
-
-    return user;
-  }
-
   @Mutation(() => UserResponse)
   async register(
     @Arg('options') options: UsernamePasswordInput
