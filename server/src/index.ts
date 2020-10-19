@@ -30,11 +30,15 @@ const main = async () => {
     context: async ({ req }) => {
       const auth = req ? req.headers.authorization : null;
       if (auth && auth.toLowerCase().startsWith('bearer ')) {
-        const decodedToken = verify(
-          auth.substring(7), SECRET
-        );
-        const currentUser = await User.findOne((decodedToken as TokenInterface).id);
-        return { currentUser };
+        try {
+          const decodedToken = verify(
+            auth.substring(7), SECRET
+          );
+          const currentUser = await User.findOne((decodedToken as TokenInterface).id);
+          return { currentUser };
+        } catch (err) {
+          return null;
+        }
       }
       return null;
     }
