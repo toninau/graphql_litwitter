@@ -60,6 +60,23 @@ export class UserResolver {
     return User.findOne(currentUser.id);
   }
 
+  @Mutation(() => User, { nullable: true })
+  @UseMiddleware(authChecker)
+  async updateUser(
+    @Arg('description') description: string,
+    @Ctx() { currentUser }: MyContext
+  ): Promise<User> {
+    const result = await User
+      .createQueryBuilder()
+      .update(User)
+      .set({ description })
+      .where('id = :id', { id: currentUser.id })
+      .returning('*')
+      .execute();
+    const user = (result.raw as User[]);
+    return (user[0]);
+  }
+
   @Mutation(() => UserResponse)
   async register(
     @Arg('options') options: UsernamePasswordInput
