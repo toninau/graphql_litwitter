@@ -1,27 +1,74 @@
-import { Arg, Resolver, Query, Int, Mutation, Ctx, UseMiddleware } from 'type-graphql';
+import {
+  Arg,
+  Resolver,
+  Query,
+  Int,
+  Mutation,
+  Ctx,
+  UseMiddleware,
+  InputType,
+  Field,
+  ObjectType
+} from 'type-graphql';
 import { Message } from '../entity/Message';
 import { MyContext } from '../types';
 import { authChecker } from '../middleware/authChecker';
+import { Max, Min } from 'class-validator';
+
+@InputType()
+class OffsetLimitInput {
+  @Field(() => Int, { defaultValue: 0, nullable: true })
+  @Min(0)
+  offset!: number;
+  @Field(() => Int, { defaultValue: 10, nullable: true })
+  @Max(10)
+  limit!: number;
+}
+
+@ObjectType()
+class PaginatedMessages {
+  @Field(() => [Message])
+  messages!: Message[];
+  @Field()
+  hasMore!: boolean;
+}
 
 @Resolver()
 export class MessageResolver {
-
   @Query(() => Message, { nullable: true })
   message(@Arg('id', () => Int) id: number): Promise<Message | undefined> {
     return Message.findOne(id, { relations: ['user'] });
   }
 
-  @Query(() => [Message])
-  async messages(@Arg('userId', () => Int) userId: number): Promise<Message[]> {
-    const messages = await Message.find({
-      relations: ['user'],
-      where: {
-        user: {
-          id: userId
-        }
-      }
-    });
-    return messages;
+  @Query(() => PaginatedMessages)
+  async messages(
+    @Arg('id', () => Int, { nullable: true }) id: number,
+    @Arg('username', () => String, { nullable: true }) username: string,
+    @Arg('options', { validate: true, nullable: true, defaultValue: { offset: 0, limit: 10 } }) options: OffsetLimitInput
+  ): Promise<PaginatedMessages> {
+
+    // One more message is returned than needed,
+    // to evaluate if more messages are available.
+    const realLimit = options.limit + 1;
+
+    // Selects query where clause based on
+    // if user id is given as an argument.
+    const { string, value } = id ?
+      { string: 'user.id = :id', value: { id } } :
+      { string: 'user.username = :username', value: { username } };
+
+    const messages = await Message
+      .createQueryBuilder('message')
+      .offset(options.offset)
+      .limit(realLimit)
+      .leftJoinAndSelect('message.user', 'user')
+      .where(string, value)
+      .getMany();
+
+    return {
+      messages: messages.slice(0, options.limit),
+      hasMore: realLimit === messages.length
+    };
   }
 
   @Mutation(() => Message)

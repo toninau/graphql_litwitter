@@ -3,8 +3,6 @@ import {
   Resolver,
   Query,
   Int,
-  FieldResolver,
-  Root,
   Mutation,
   InputType,
   Field,
@@ -13,7 +11,6 @@ import {
 import argon2 from 'argon2';
 import { sign } from 'jsonwebtoken';
 
-import { Message } from '../entity/Message';
 import { User } from '../entity/User';
 import { registerValidation } from '../utils/registerValidation';
 
@@ -45,24 +42,6 @@ const SECRET = process.env.SECRET || 'TEMP_VALUE';
 
 @Resolver(() => User)
 export class UserResolver {
-  @FieldResolver(() => [Message])
-  async messages(
-    @Root() user: User,
-    @Arg('limit', () => Int, { nullable: true }) limit: number,
-    @Arg('offset', () => Int, { nullable: true }) offset: number
-  ): Promise<Message[]> {
-
-    const messages = await Message
-      .createQueryBuilder('message')
-      .offset(offset)
-      .limit(limit)
-      .leftJoinAndSelect('message.user', 'user')
-      .where('user.id = :id', { id: user.id })
-      .getMany();
-
-    return messages;
-  }
-
   @Query(() => User, { nullable: true })
   user(
     @Arg('id', () => Int, { nullable: true }) id: number,

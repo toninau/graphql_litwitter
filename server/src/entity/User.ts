@@ -27,7 +27,6 @@ export class User extends BaseEntity {
   @Column()
   password!: string;
 
-  @Field(() => [Message])
   @OneToMany(() => Message, message => message.user)
   messages!: Message[];
 }
