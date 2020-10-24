@@ -10,10 +10,11 @@ import {
   Field,
   ObjectType
 } from 'type-graphql';
+import { Max, Min } from 'class-validator';
+
+import { authChecker } from '../middleware/authChecker';
 import { Message } from '../entity/Message';
 import { MyContext } from '../types';
-import { authChecker } from '../middleware/authChecker';
-import { Max, Min } from 'class-validator';
 
 @InputType()
 class OffsetLimitInput {

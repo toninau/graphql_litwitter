@@ -6,11 +6,15 @@ import {
   Mutation,
   InputType,
   Field,
-  ObjectType
+  ObjectType,
+  Ctx,
+  UseMiddleware
 } from 'type-graphql';
 import argon2 from 'argon2';
 import { sign } from 'jsonwebtoken';
 
+import { authChecker } from '../middleware/authChecker';
+import { MyContext } from '../types';
 import { User } from '../entity/User';
 import { registerValidation } from '../utils/registerValidation';
 
@@ -48,6 +52,12 @@ export class UserResolver {
     @Arg('username', () => String, { nullable: true }) username: string
   ): Promise<User | undefined> {
     return id ? User.findOne(id) : User.findOne({ where: { username } });
+  }
+
+  @Query(() => User, { nullable: true })
+  @UseMiddleware(authChecker)
+  me(@Ctx() { currentUser }: MyContext): Promise<User | undefined> {
+    return User.findOne(currentUser.id);
   }
 
   @Mutation(() => UserResponse)
