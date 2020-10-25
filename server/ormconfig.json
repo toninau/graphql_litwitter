@@ -10,7 +10,6 @@
   "entities": [
      "src/entity/**/*.ts"
   ],
-  "dropSchema": true,
   "migrations": [
      "src/migration/**/*.ts"
   ],

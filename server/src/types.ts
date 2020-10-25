@@ -5,5 +5,6 @@ export type MyContext = {
 };
 
 export interface TokenInterface {
+  username: string,
   id: string;
 }
