@@ -1,0 +1,20 @@
+.landing-page__container {
+  height: 100vh;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.landing-page__section {
+  flex-basis: 0%;
+  flex-grow: 1;
+  flex-shrink: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3em;
+  width: 100%;
+}
+
+.landing-page__section--background {
+  background-image: url(../img/Large-Triangles.svg);
+}
