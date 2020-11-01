@@ -2,13 +2,22 @@ import React from 'react';
 import { Form, Formik } from 'formik';
 
 import { FormikTextField } from '../components/FormField';
+import { AccountValues } from '../types';
 
-import { Card, CardContent, Button, Box } from '@material-ui/core';
+import { Card, CardContent, Button, Box, Typography } from '@material-ui/core';
 
-const LogInForm: React.FC = () => {
+interface AccountProps {
+  handleSubmit: (values: AccountValues) => void;
+  text: string;
+}
+
+const AccountForm: React.FC<AccountProps> = ({ handleSubmit, text }) => {
   return (
     <Card>
       <CardContent>
+        <Typography variant="h4">
+          {text}
+        </Typography>
         <Formik
           initialValues={{
             username: '',
@@ -26,7 +35,7 @@ const LogInForm: React.FC = () => {
             return errors;
           }}
           onSubmit={(values) => {
-            console.log(values);
+            handleSubmit(values);
           }}>
           {({ isValid, dirty }) => {
             return (
@@ -61,4 +70,4 @@ const LogInForm: React.FC = () => {
   );
 };
 
-export default LogInForm;
+export default AccountForm;

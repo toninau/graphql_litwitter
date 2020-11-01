@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 
-import LogInForm from './LogInForm';
-import SignUpForm from './SignUpForm';
-
+import AccountForm from './AccountForm';
+import { AccountValues } from '../types';
 import './landingPage.css';
 
 import {
@@ -15,7 +14,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
-  makeStyles
+  makeStyles,
 } from '@material-ui/core';
 import { Search, PeopleAlt, AccessTime } from '@material-ui/icons';
 
@@ -47,6 +46,14 @@ const LandingPage: React.FC = () => {
     }
   ];
 
+  const handleSignUp = (values: AccountValues): void => {
+    console.log(values);
+  };
+
+  const handleLogIn = (values: AccountValues): void => {
+    console.log(values);
+  };
+
   return (
     <div className="landing-page__container">
       <div className="landing-page__section landing-page__section--background">
@@ -67,11 +74,10 @@ const LandingPage: React.FC = () => {
           flexDirection="column"
           width="300px">
           <Box paddingBottom={2}>
-            {
-              logIn ?
-                <LogInForm /> :
-                <SignUpForm />
-            }
+            <AccountForm
+              handleSubmit={logIn ? handleLogIn : handleSignUp}
+              text={logIn ? 'Log in to your account' : 'Create a new account'}
+            />
           </Box>
           <Grid
             style={{ textAlign: 'center' }}
