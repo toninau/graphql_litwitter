@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
-
+import { Link as RouterLink, useHistory } from 'react-router-dom';
+import { useMutation } from '@apollo/client';
+import { LOGIN_USER } from '../queries/userQueries';
 import AccountForm from './AccountForm';
 import { AccountValues } from '../types';
 import './landingPage.css';
-
 import {
   Box,
   Grid,
@@ -18,6 +18,18 @@ import {
 } from '@material-ui/core';
 import { Search, PeopleAlt, AccessTime } from '@material-ui/icons';
 
+type FieldError = {
+  field: string;
+  message: string;
+};
+
+interface LoginData {
+  login: {
+    errors: FieldError[] | null;
+    value?: string;
+  };
+}
+
 const useStyles = makeStyles({
   item: {
     '& span, & svg': {
@@ -28,7 +40,10 @@ const useStyles = makeStyles({
 });
 
 const LandingPage: React.FC = () => {
+  const [loginUser, { loading }] = useMutation<LoginData>(LOGIN_USER);
   const [logIn, setLogIn] = useState(true);
+  const [errors, setErrors] = useState<FieldError[] | null>(null);
+  const history = useHistory();
   const classes = useStyles();
 
   const landingList = [
@@ -50,8 +65,22 @@ const LandingPage: React.FC = () => {
     console.log(values);
   };
 
-  const handleLogIn = (values: AccountValues): void => {
-    console.log(values);
+  const handleLogIn = async (values: AccountValues) => {
+    try {
+      const { data } = await loginUser({
+        variables: {
+          ...values
+        }
+      });
+      if (data?.login.errors) {
+        setErrors(data.login.errors);
+      } else if (data?.login.value) {
+        console.log('to localstorage', data.login.value);
+        history.push('/home');
+      }
+    } catch (error) {
+      setErrors([{ field: 'none', message: 'something unexpected happened' }]);
+    }
   };
 
   return (
@@ -77,6 +106,7 @@ const LandingPage: React.FC = () => {
             <AccountForm
               handleSubmit={logIn ? handleLogIn : handleSignUp}
               text={logIn ? 'Log in to your account' : 'Create a new account'}
+              loading={!!loading}
             />
           </Box>
           <Grid
@@ -94,11 +124,14 @@ const LandingPage: React.FC = () => {
             <Divider flexItem orientation="vertical" />
             <Grid item xs>
               <Button component={RouterLink} to="/home">
-                go to main page
+                home page
               </Button>
             </Grid>
           </Grid>
         </Box>
+        {errors &&
+          <p>{errors[0].message}</p>
+        }
       </div>
     </div >
   );

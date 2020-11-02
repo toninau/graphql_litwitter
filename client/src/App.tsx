@@ -1,5 +1,5 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch, Route, Link } from 'react-router-dom';
 
 import LandingPage from './LandingPage';
 
@@ -14,7 +14,7 @@ const App: React.FC = () => {
           <LandingPage />
         </Route>
         <Route path="/home">
-          <p>home page</p>
+          <Link to="/">back to landingpage</Link>
         </Route>
       </Switch>
     </div>

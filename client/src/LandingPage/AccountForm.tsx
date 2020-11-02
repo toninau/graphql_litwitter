@@ -4,14 +4,15 @@ import { Form, Formik } from 'formik';
 import { FormikTextField } from '../components/FormField';
 import { AccountValues } from '../types';
 
-import { Card, CardContent, Button, Box, Typography } from '@material-ui/core';
+import { Card, CardContent, Button, Box, Typography, CircularProgress } from '@material-ui/core';
 
 interface AccountProps {
   handleSubmit: (values: AccountValues) => void;
   text: string;
+  loading: boolean;
 }
 
-const AccountForm: React.FC<AccountProps> = ({ handleSubmit, text }) => {
+const AccountForm: React.FC<AccountProps> = ({ handleSubmit, text, loading }) => {
   return (
     <Card>
       <CardContent>
@@ -55,10 +56,10 @@ const AccountForm: React.FC<AccountProps> = ({ handleSubmit, text }) => {
                   />
                   <Button
                     type="submit"
-                    disabled={!dirty || !isValid}
+                    disabled={!dirty || !isValid || loading}
                     variant="contained"
                     color="primary">
-                    submit
+                    {loading ? <CircularProgress size={24} /> : 'submit'}
                   </Button>
                 </Box>
               </Form>
