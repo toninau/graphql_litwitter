@@ -3,6 +3,7 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 
 import LandingPage from './LandingPage';
 import HomePage from './HomePage';
+import UserPage from './UserPage';
 import { useStateValue } from './state';
 
 import { CssBaseline } from '@material-ui/core';
@@ -19,6 +20,12 @@ const App: React.FC = () => {
         </Route>
         <Route path="/home">
           <HomePage />
+        </Route>
+        <Route path="/u/:username">
+          <UserPage />
+        </Route>
+        <Route path="*">
+          <p>page not found</p>
         </Route>
       </Switch>
     </>

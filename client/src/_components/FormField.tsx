@@ -10,6 +10,7 @@ interface TextProps {
   type: 'text' | 'password';
   placeholder: string;
   name: string;
+  variant?: 'outlined' | 'filled'
 }
 
 export const FormikTextField: React.FC<TextProps> = ({ label, ...props }) => {

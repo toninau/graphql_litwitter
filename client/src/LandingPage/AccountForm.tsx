@@ -16,7 +16,7 @@ const AccountForm: React.FC<AccountProps> = ({ handleSubmit, text, loading }) =>
   return (
     <Card>
       <CardContent>
-        <Typography variant="h4">
+        <Typography variant="h4" gutterBottom>
           {text}
         </Typography>
         <Formik
