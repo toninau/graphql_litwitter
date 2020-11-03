@@ -1,23 +1,27 @@
 import React from 'react';
-import { Switch, Route, Link } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
 
 import LandingPage from './LandingPage';
+import HomePage from './HomePage';
+import { useStateValue } from './state';
 
 import { CssBaseline } from '@material-ui/core';
 
 const App: React.FC = () => {
+  const [token] = useStateValue();
+
   return (
-    <div>
+    <>
       <CssBaseline />
       <Switch>
         <Route exact path="/">
-          <LandingPage />
+          {!token ? <LandingPage /> : <Redirect to="home" />}
         </Route>
         <Route path="/home">
-          <Link to="/">back to landingpage</Link>
+          <HomePage />
         </Route>
       </Switch>
-    </div>
+    </>
   );
 };
 

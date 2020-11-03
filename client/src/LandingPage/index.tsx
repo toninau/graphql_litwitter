@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
+
 import { LOGIN_USER } from '../queries/userQueries';
 import AccountForm from './AccountForm';
 import { AccountValues } from '../types';
+import { useStateValue } from '../state';
+import storage from '../storage';
+
 import './landingPage.css';
+
 import {
   Box,
   Grid,
@@ -43,6 +48,7 @@ const LandingPage: React.FC = () => {
   const [loginUser, { loading }] = useMutation<LoginData>(LOGIN_USER);
   const [logIn, setLogIn] = useState(true);
   const [errors, setErrors] = useState<FieldError[] | null>(null);
+  const [, setToken] = useStateValue();
   const history = useHistory();
   const classes = useStyles();
 
@@ -75,7 +81,8 @@ const LandingPage: React.FC = () => {
       if (data?.login.errors) {
         setErrors(data.login.errors);
       } else if (data?.login.value) {
-        console.log('to localstorage', data.login.value);
+        storage.saveToken(data.login.value);
+        setToken(data.login.value);
         history.push('/home');
       }
     } catch (error) {
