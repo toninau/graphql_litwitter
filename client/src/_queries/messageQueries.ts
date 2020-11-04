@@ -12,3 +12,19 @@ export const SEND_MESSAGE = gql`
     }
   }
 `;
+
+export const USER_MESSAGES = gql`
+  query messages($username: String!, $offset: Int){
+    messages(username: $username, options: { offset: $offset }) {
+      messages {
+        createdAt
+        id
+        text
+        user {
+          username
+        }
+      }
+      hasMore
+    }
+  }
+`;
