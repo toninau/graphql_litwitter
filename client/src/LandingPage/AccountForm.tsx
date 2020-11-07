@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Formik } from 'formik';
 
-import { FormikTextField } from '../_components/FormField';
+import { FormikTextField } from '../components/FormField';
 import { AccountValues } from '../types';
 
 import { Card, CardContent, Button, Box, Typography, CircularProgress } from '@material-ui/core';

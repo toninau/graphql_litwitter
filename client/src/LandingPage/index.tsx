@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 
-import { LOGIN_USER } from '../_queries/userQueries';
+import { LOGIN_USER } from '../queries/userQueries';
 import AccountForm from './AccountForm';
 import { AccountValues } from '../types';
 import { useStateValue } from '../state';
