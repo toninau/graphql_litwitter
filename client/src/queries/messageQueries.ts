@@ -15,7 +15,7 @@ export const SEND_MESSAGE = gql`
 
 export const USER_MESSAGES = gql`
   query messages($username: String!, $offset: Int){
-    messages(username: $username, options: { offset: $offset }) {
+    messages(username: $username, options: { offset: $offset, limit: 5 }) {
       messages {
         createdAt
         id

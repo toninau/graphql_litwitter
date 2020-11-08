@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouteMatch } from 'react-router-dom';
-import { useApolloClient } from '@apollo/client';
+import { useQuery, useApolloClient } from '@apollo/client';
 
 import { USER_MESSAGES } from '../queries/messageQueries';
+import { FETCH_USER } from '../queries/userQueries';
 import { User } from '../types';
 import { useStateValue } from '../state';
 import storage from '../storage';
@@ -24,52 +25,71 @@ interface MessageData {
     hasMore: boolean;
     messages: Messages[];
   };
-  loading: boolean;
 }
 
 const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
   const match = useRouteMatch<{ username: string }>('/u/:username');
-  const client = useApolloClient();
-  const [messages, setMessages] = useState<Messages[]>([]);
   const [token, setToken] = useStateValue();
+  const client = useApolloClient();
+  const { loading, data } = useQuery<{ user: User }>(
+    FETCH_USER, { variables: { username: match?.params.username } }
+  );
+  const [offset, setOffset] = useState(0);
+  const [{ messages, hasMore }, setUserMessages] = useState<{ messages: Messages[], hasMore: boolean }>({
+    messages: [],
+    hasMore: true
+  });
 
-  //haettava userin tiedot fetchUser
-
-  // tämän korjaaminen, näyttää aikaisemman tuloksen (ei hae uutta)
-  const fetchMessages = async () => {
-    try {
+  useEffect(() => {
+    const fetchMessage = async () => {
       const { data } = await client.query<MessageData>({
         query: USER_MESSAGES,
         variables: {
           username: match?.params.username,
-          offset: 0
+          offset
         }
       });
-      console.log(data);
-      setMessages(data.messages.messages);
-    } catch (error) {
-      console.log(error);
+      setUserMessages((prevMessages) => ({
+        messages: prevMessages.messages.concat(data.messages.messages),
+        hasMore: data.messages.hasMore
+      }));
+    };
+    if (hasMore && data?.user) {
+      console.log('fetch messages');
+      void fetchMessage();
     }
-  };
+  }, [offset, data]);
 
   const logout = () => {
     storage.removeToken();
     setToken('');
   };
 
+  if (loading) {
+    return (
+      <p>loading...</p>
+    );
+  }
+  if (!loading && !data?.user) {
+    return (
+      <p>user does not exist</p>
+    );
+  }
   return (
     <div>
-      <p>{match?.params.username}</p>
+      <p>{JSON.stringify(data)}</p>
       {(match?.params.username === user?.username) &&
         <Box>
           <SendMessage token={token} />
           <Button onClick={logout}>logout</Button>
         </Box>
       }
-      <button onClick={fetchMessages}>fetch</button>
       {messages.map((message) => (
         <p key={message.id}>{JSON.stringify(message)}</p>
       ))}
+      {hasMore &&
+        <button onClick={() => setOffset(prevOffset => prevOffset + 5)}>get more messages</button>
+      }
     </div>
   );
 };

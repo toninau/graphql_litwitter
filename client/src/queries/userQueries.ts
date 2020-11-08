@@ -24,3 +24,13 @@ export const ME_USER = gql`
     }
   }
 `;
+
+export const FETCH_USER = gql`
+  query user($username: String!){
+    user(username: $username) {
+      id
+      username
+      description
+    }
+  }
+`;
