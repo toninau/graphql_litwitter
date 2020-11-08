@@ -64,6 +64,7 @@ export class MessageResolver {
       .limit(realLimit)
       .leftJoinAndSelect('message.user', 'user')
       .where(string, value)
+      .orderBy('message.createdAt', 'DESC')
       .getMany();
 
     return {
