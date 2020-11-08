@@ -12,19 +12,15 @@ import SendMessage from '../components/SendMessage';
 
 import { Box, Button } from '@material-ui/core';
 
-type Messages = {
-  id: number;
-  text: string;
-  user: {
-    username: string;
-  }
-};
-
 interface MessageData {
-  messages: {
-    hasMore: boolean;
-    messages: Messages[];
-  };
+  hasMore: boolean;
+  messages: Array<{
+    id: number;
+    text: string;
+    user: {
+      username: string;
+    }
+  }>;
 }
 
 const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
@@ -35,14 +31,14 @@ const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
     FETCH_USER, { variables: { username: match?.params.username } }
   );
   const [offset, setOffset] = useState(0);
-  const [{ messages, hasMore }, setUserMessages] = useState<{ messages: Messages[], hasMore: boolean }>({
+  const [{ messages, hasMore }, setUserMessages] = useState<MessageData>({
     messages: [],
     hasMore: true
   });
 
   useEffect(() => {
     const fetchMessage = async () => {
-      const { data } = await client.query<MessageData>({
+      const { data } = await client.query<{ messages: MessageData }>({
         query: USER_MESSAGES,
         variables: {
           username: match?.params.username,
