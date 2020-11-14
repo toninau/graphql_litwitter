@@ -25,6 +25,7 @@ export const FormikTextField: React.FC<TextProps> = ({ label, ...props }) => {
       error={!!errorText}
       helperText={errorText}
       style={{ minHeight: '5rem' }}
+      size="small"
     />
   );
 };

@@ -8,9 +8,11 @@ import { User } from '../types';
 import { useStateValue } from '../state';
 import storage from '../storage';
 
+import UserProfile from './UserProfile';
 import SendMessage from '../components/SendMessage';
+import UserMessages from './UserMessages';
 
-import { Box, Button } from '@material-ui/core';
+import { Container } from '@material-ui/core';
 
 interface MessageData {
   hasMore: boolean;
@@ -31,14 +33,15 @@ const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
     FETCH_USER, { variables: { username: match?.params.username } }
   );
   const [offset, setOffset] = useState(0);
-  const [{ messages, hasMore }, setUserMessages] = useState<MessageData>({
+  const [userMessages, setUserMessages] = useState<MessageData & { loading: boolean }>({
     messages: [],
-    hasMore: true
+    hasMore: true,
+    loading: true
   });
 
   useEffect(() => {
     const fetchMessage = async () => {
-      const { data } = await client.query<{ messages: MessageData }>({
+      const { data, loading } = await client.query<{ messages: MessageData }>({
         query: USER_MESSAGES,
         variables: {
           username: match?.params.username,
@@ -47,10 +50,11 @@ const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
       });
       setUserMessages((prevMessages) => ({
         messages: prevMessages.messages.concat(data.messages.messages),
-        hasMore: data.messages.hasMore
+        hasMore: data.messages.hasMore,
+        loading
       }));
     };
-    if (hasMore && data?.user) {
+    if (userMessages.hasMore && data?.user) {
       console.log('fetch messages');
       void fetchMessage();
     }
@@ -61,32 +65,36 @@ const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
     setToken('');
   };
 
-  if (loading) {
-    return (
-      <p>loading...</p>
-    );
-  }
+  const getMore = () => {
+    setOffset(prevOffeset => prevOffeset + 5);
+    setUserMessages(prevUserMessages => ({ ...prevUserMessages, loading: true }));
+  };
+
   if (!loading && !data?.user) {
     return (
       <p>user does not exist</p>
     );
   }
+
   return (
-    <div>
-      <p>{JSON.stringify(data)}</p>
-      {(match?.params.username === user?.username) &&
-        <Box>
+    <Container maxWidth="sm">
+      <div style={{ paddingTop: '2em' }}>
+        <UserProfile
+          user={data?.user}
+          owner={match?.params.username === user?.username}
+          logout={logout}
+        />
+        {(match?.params.username === user?.username) &&
           <SendMessage token={token} />
-          <Button onClick={logout}>logout</Button>
-        </Box>
-      }
-      {messages.map((message) => (
-        <p key={message.id}>{JSON.stringify(message)}</p>
-      ))}
-      {hasMore &&
-        <button onClick={() => setOffset(prevOffset => prevOffset + 5)}>get more messages</button>
-      }
-    </div>
+        }
+      </div>
+      <UserMessages
+        messages={userMessages.messages}
+        loading={userMessages.loading}
+        hasMore={userMessages.hasMore}
+        getMore={getMore}
+      />
+    </Container>
   );
 };
 

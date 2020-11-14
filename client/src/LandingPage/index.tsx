@@ -13,8 +13,7 @@ import './landingPage.css';
 import {
   Box,
   Grid,
-  Button,
-  Divider,
+  Link,
   List,
   ListItem,
   ListItemIcon,
@@ -92,7 +91,7 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className="landing-page__container">
-      <div className="landing-page__section landing-page__section--background">
+      <div className="landing-page__section landing-page__section--background landing-page__section--blue">
         <List>
           {landingList.map(item => (
             <ListItem className={classes.item} key={item.text}>
@@ -104,7 +103,7 @@ const LandingPage: React.FC = () => {
           ))}
         </List>
       </div>
-      <div className="landing-page__section">
+      <div className="landing-page__section landing-page__section--white">
         <Box
           display="flex"
           flexDirection="column"
@@ -112,27 +111,20 @@ const LandingPage: React.FC = () => {
           <Box paddingBottom={2}>
             <AccountForm
               handleSubmit={logIn ? handleLogIn : handleSignUp}
-              text={logIn ? 'Log in to your account' : 'Create a new account'}
+              text={logIn ? 'Log In' : 'Sign Up'}
               loading={!!loading}
             />
           </Box>
-          <Grid
-            style={{ textAlign: 'center' }}
-            container
-            alignItems="center">
+          <Grid container>
             <Grid item xs>
-              <Button
-                variant="outlined"
-                color="secondary"
-                onClick={() => setLogIn(prevLogIn => !prevLogIn)}>
+              <Link component="button" variant="body2" onClick={() => setLogIn(prevLogIn => !prevLogIn)}>
                 {!logIn ? 'Log In' : 'Sign Up'}
-              </Button>
+              </Link>
             </Grid>
-            <Divider flexItem orientation="vertical" />
-            <Grid item xs>
-              <Button component={RouterLink} to="/home">
-                home page
-              </Button>
+            <Grid item>
+              <Link variant="body2" component={RouterLink} to="/home">
+                Home page
+              </Link>
             </Grid>
           </Grid>
         </Box>

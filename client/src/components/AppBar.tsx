@@ -12,7 +12,8 @@ import {
   InputBase,
   fade,
   IconButton,
-  Button
+  Button,
+  Avatar
 } from '@material-ui/core';
 import {
   Search as SearchIcon,
@@ -62,6 +63,10 @@ const useStyle = makeStyles((theme: Theme) =>
         width: '20ch',
       },
     },
+    avatar: {
+      backgroundColor: 'green',
+      textDecoration: 'none'
+    }
   })
 );
 
@@ -69,7 +74,7 @@ const AppBar: React.FC<{ user: User | null }> = ({ user }) => {
   const classes = useStyle();
 
   return (
-    <MUIAppBar position="sticky">
+    <MUIAppBar position="sticky" elevation={0}>
       <Toolbar>
         <IconButton
           color="inherit"
@@ -94,14 +99,12 @@ const AppBar: React.FC<{ user: User | null }> = ({ user }) => {
         </div>
         <div className={classes.grow} />
         {user ?
-          <IconButton
-            edge="end"
-            aria-label="account of current user"
-            color="inherit"
+          <Avatar
+            className={classes.avatar}
             component={Link}
             to={`/u/${user.username}`}>
-            <AccountCircle />
-          </IconButton> :
+            {user.username.substring(0, 1).toUpperCase()}
+          </Avatar> :
           <Button
             variant="outlined"
             color="inherit"

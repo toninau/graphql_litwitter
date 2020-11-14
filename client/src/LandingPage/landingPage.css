@@ -11,10 +11,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 3em;
+  padding: 2em;
   width: 100%;
 }
 
 .landing-page__section--background {
   background-image: url(../img/Large-Triangles.svg);
+}
+
+.landing-page__section--white {
+  background-color: white;
+}
+
+.landing-page__section--blue {
+  background-color: skyblue;
 }
