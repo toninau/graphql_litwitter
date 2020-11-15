@@ -3,7 +3,16 @@ import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { SEND_MESSAGE } from '../queries/messageQueries';
 
-import { InputBase, Button, Box, Paper, Divider, CircularProgress, makeStyles, Theme, createStyles } from '@material-ui/core';
+import {
+  InputBase,
+  Button,
+  Box,
+  Divider,
+  CircularProgress,
+  makeStyles,
+  Theme,
+  createStyles
+} from '@material-ui/core';
 import { Send as SendIcon } from '@material-ui/icons';
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -43,28 +52,27 @@ const SendMessage: React.FC<{ token: string }> = ({ token }) => {
   };
 
   return (
-    <Paper variant="outlined" square>
-      <form onSubmit={handleSubmit}>
-        <Box display="flex" alignItems="baseline" padding={2}>
-          <InputBase
-            placeholder="whats happening?"
-            fullWidth
-            multiline
-            value={input}
-            onChange={({ target }) => setInput(target.value)}
-          />
-          <Divider flexItem orientation="vertical" light variant="middle" />
-          <Button
-            className={classes.button}
-            type="submit"
-            variant="contained"
-            color="primary"
-            endIcon={!loading && <SendIcon />}>
-            {loading ? <CircularProgress color="inherit" size={24} /> : 'send'}
-          </Button>
-        </Box>
-      </form>
-    </Paper>
+    <form onSubmit={handleSubmit}>
+      <Box display="flex" alignItems="baseline" padding={2}>
+        <InputBase
+          placeholder="whats happening?"
+          fullWidth
+          multiline
+          value={input}
+          onChange={({ target }) => setInput(target.value)}
+        />
+        <Divider flexItem orientation="vertical" light variant="middle" />
+        <Button
+          className={classes.button}
+          type="submit"
+          variant="contained"
+          color="primary"
+          disabled={loading || !input}
+          endIcon={!loading && <SendIcon />}>
+          {loading ? <CircularProgress color="inherit" size={24} /> : 'send'}
+        </Button>
+      </Box>
+    </form>
   );
 };
 

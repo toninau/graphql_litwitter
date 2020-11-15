@@ -12,7 +12,8 @@ import UserProfile from './UserProfile';
 import SendMessage from '../components/SendMessage';
 import UserMessages from './UserMessages';
 
-import { Container } from '@material-ui/core';
+import { Box, Container, createStyles, Divider, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
+import { Message as MessageIcon } from '@material-ui/icons';
 
 interface MessageData {
   hasMore: boolean;
@@ -24,6 +25,15 @@ interface MessageData {
     }
   }>;
 }
+
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    messageIcon: {
+      marginRight: theme.spacing(1),
+      color: theme.palette.primary.main
+    }
+  }),
+);
 
 const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
   const match = useRouteMatch<{ username: string }>('/u/:username');
@@ -38,6 +48,7 @@ const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
     hasMore: true,
     loading: true
   });
+  const classes = useStyles();
 
   useEffect(() => {
     const fetchMessage = async () => {
@@ -78,16 +89,26 @@ const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
 
   return (
     <Container maxWidth="sm">
-      <div style={{ paddingTop: '2em' }}>
+      <Paper variant="outlined" square>
         <UserProfile
           user={data?.user}
           owner={match?.params.username === user?.username}
           logout={logout}
+          token={token}
         />
+        <Divider variant="middle" light />
         {(match?.params.username === user?.username) &&
           <SendMessage token={token} />
         }
-      </div>
+        <Divider variant="middle" light />
+
+        <Box display="flex" justifyContent="center" alignItems="center" padding={1}>
+          <MessageIcon className={classes.messageIcon} />
+          <Typography variant="h6" color="primary">
+            Messages
+          </Typography>
+        </Box>
+      </Paper>
       <UserMessages
         messages={userMessages.messages}
         loading={userMessages.loading}

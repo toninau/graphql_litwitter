@@ -57,6 +57,7 @@ const AccountForm: React.FC<AccountProps> = ({ handleSubmit, text, loading }) =>
                   type="text"
                   placeholder="MrPotatio"
                   variant="outlined"
+                  size="small"
                 />
                 <FormikTextField
                   label="Password"
@@ -64,6 +65,7 @@ const AccountForm: React.FC<AccountProps> = ({ handleSubmit, text, loading }) =>
                   type="password"
                   placeholder="s3cr3t"
                   variant="outlined"
+                  size="small"
                 />
                 <Button
                   type="submit"

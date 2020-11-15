@@ -10,7 +10,10 @@ interface TextProps {
   type: 'text' | 'password';
   placeholder: string;
   name: string;
-  variant?: 'outlined' | 'filled'
+  variant?: 'outlined' | 'filled';
+  size?: 'small' | 'medium';
+  multiline?: boolean;
+  rows?: number;
 }
 
 export const FormikTextField: React.FC<TextProps> = ({ label, ...props }) => {
@@ -25,7 +28,6 @@ export const FormikTextField: React.FC<TextProps> = ({ label, ...props }) => {
       error={!!errorText}
       helperText={errorText}
       style={{ minHeight: '5rem' }}
-      size="small"
     />
   );
 };

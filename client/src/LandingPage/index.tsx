@@ -91,7 +91,7 @@ const LandingPage: React.FC = () => {
 
   return (
     <div className="landing-page__container">
-      <div className="landing-page__section landing-page__section--background landing-page__section--blue">
+      <div className="landing-page__section landing-page__section--background">
         <List>
           {landingList.map(item => (
             <ListItem className={classes.item} key={item.text}>

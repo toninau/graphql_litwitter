@@ -16,13 +16,10 @@
 }
 
 .landing-page__section--background {
+  background-color: skyblue;
   background-image: url(../img/Large-Triangles.svg);
 }
 
 .landing-page__section--white {
   background-color: white;
-}
-
-.landing-page__section--blue {
-  background-color: skyblue;
 }

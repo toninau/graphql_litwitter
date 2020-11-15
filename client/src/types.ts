@@ -6,7 +6,9 @@ export type AccountValues = {
 export type User = {
   id: number;
   username: string;
-  description: string;
+  name?: string;
+  description?: string;
+  createdAt: string;
 };
 
 export type Message = {

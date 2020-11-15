@@ -31,6 +31,17 @@ export const FETCH_USER = gql`
       id
       username
       description
+      name
+      createdAt
+    }
+  }
+`;
+
+export const UPDATE_USER = gql`
+  mutation updateUser($name: String!, $description: String!) {
+    updateUser(name: $name, description: $description) {
+      description
+      name
     }
   }
 `;

@@ -64,7 +64,7 @@ const useStyle = makeStyles((theme: Theme) =>
       },
     },
     avatar: {
-      backgroundColor: 'green',
+      backgroundColor: theme.palette.secondary.light,
       textDecoration: 'none'
     }
   })

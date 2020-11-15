@@ -5,6 +5,7 @@ import {
   PrimaryGeneratedColumn,
   BaseEntity,
   OneToMany,
+  CreateDateColumn,
 } from 'typeorm';
 import { Message } from './Message';
 
@@ -21,8 +22,16 @@ export class User extends BaseEntity {
   username!: string;
 
   @Field({ nullable: true })
+  @Column({ length: 14, nullable: true })
+  name?: string;
+
+  @Field({ nullable: true })
   @Column({ length: 140, nullable: true })
   description?: string;
+
+  @Field()
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt!: Date;
 
   @Column()
   password!: string;

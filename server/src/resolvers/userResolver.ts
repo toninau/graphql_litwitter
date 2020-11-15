@@ -63,13 +63,14 @@ export class UserResolver {
   @Mutation(() => User, { nullable: true })
   @UseMiddleware(authChecker)
   async updateUser(
-    @Arg('description') description: string,
+    @Arg('description', { nullable: true }) description: string,
+    @Arg('name', { nullable: true }) name: string,
     @Ctx() { currentUser }: MyContext
   ): Promise<User> {
     const result = await User
       .createQueryBuilder()
       .update(User)
-      .set({ description })
+      .set({ description, name })
       .where('id = :id', { id: currentUser.id })
       .returning('*')
       .execute();
@@ -88,6 +89,7 @@ export class UserResolver {
     const hashedPassword = await argon2.hash(options.password);
     const userToCreate = User.create({
       username: options.username,
+      name: options.username,
       password: hashedPassword
     });
     let user;
