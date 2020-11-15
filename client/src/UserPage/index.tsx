@@ -4,7 +4,7 @@ import { useQuery, useApolloClient } from '@apollo/client';
 
 import { USER_MESSAGES } from '../queries/messageQueries';
 import { FETCH_USER } from '../queries/userQueries';
-import { User } from '../types';
+import { User, Message } from '../types';
 import { useStateValue } from '../state';
 import storage from '../storage';
 
@@ -17,13 +17,7 @@ import { Message as MessageIcon } from '@material-ui/icons';
 
 interface MessageData {
   hasMore: boolean;
-  messages: Array<{
-    id: number;
-    text: string;
-    user: {
-      username: string;
-    }
-  }>;
+  messages: Array<Message>;
 }
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -88,7 +82,9 @@ const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
   }
 
   return (
-    <Container maxWidth="sm">
+    <Container
+      style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}
+      maxWidth="sm">
       <Paper variant="outlined" square>
         <UserProfile
           user={data?.user}

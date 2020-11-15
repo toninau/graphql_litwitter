@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link as RouterLink, useHistory } from 'react-router-dom';
 import { useMutation } from '@apollo/client';
 
-import { LOGIN_USER } from '../queries/userQueries';
+import { LOGIN_USER, SIGNUP_USER } from '../queries/userQueries';
 import AccountForm from './AccountForm';
 import { AccountValues } from '../types';
 import { useStateValue } from '../state';
@@ -27,11 +27,9 @@ type FieldError = {
   message: string;
 };
 
-interface LoginData {
-  login: {
-    errors: FieldError[] | null;
-    value?: string;
-  };
+interface Data {
+  errors: FieldError[] | null;
+  value?: string;
 }
 
 const useStyles = makeStyles({
@@ -44,7 +42,8 @@ const useStyles = makeStyles({
 });
 
 const LandingPage: React.FC = () => {
-  const [loginUser, { loading }] = useMutation<LoginData>(LOGIN_USER);
+  const [loginUser, { loading: loginLoading }] = useMutation<{ login: Data }>(LOGIN_USER);
+  const [signupUser, { loading: signupLoading }] = useMutation<{ register: Data }>(SIGNUP_USER);
   const [logIn, setLogIn] = useState(true);
   const [errors, setErrors] = useState<FieldError[] | null>(null);
   const [, setToken] = useStateValue();
@@ -66,8 +65,23 @@ const LandingPage: React.FC = () => {
     }
   ];
 
-  const handleSignUp = (values: AccountValues): void => {
-    console.log(values);
+  const handleSignUp = async (values: AccountValues) => {
+    try {
+      const { data } = await signupUser({
+        variables: {
+          ...values
+        }
+      });
+      if (data?.register.errors) {
+        setErrors(data.register.errors);
+      } else if (data?.register.value) {
+        storage.saveToken(data.register.value);
+        setToken(data.register.value);
+        history.push('/home');
+      }
+    } catch (error) {
+      setErrors([{ field: 'none', message: 'something unexpected happened' }]);
+    }
   };
 
   const handleLogIn = async (values: AccountValues) => {
@@ -112,7 +126,7 @@ const LandingPage: React.FC = () => {
             <AccountForm
               handleSubmit={logIn ? handleLogIn : handleSignUp}
               text={logIn ? 'Log In' : 'Sign Up'}
-              loading={!!loading}
+              loading={loginLoading || signupLoading}
             />
           </Box>
           <Grid container>

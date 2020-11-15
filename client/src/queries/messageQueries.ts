@@ -22,6 +22,7 @@ export const USER_MESSAGES = gql`
         text
         user {
           username
+          name
         }
       }
       hasMore

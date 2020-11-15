@@ -27,7 +27,7 @@ const SkeletonMessage: React.FC = () => {
           }
         />
       </ListItem>
-      <Divider variant="inset" />
+      <Divider variant="inset" component="li" />
     </>
   );
 };

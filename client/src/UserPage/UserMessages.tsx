@@ -15,16 +15,18 @@ interface UserMessagesProps {
 
 const UserMessages: React.FC<UserMessagesProps> = ({ messages, loading, hasMore, getMore }) => {
   return (
-    <Paper variant="outlined" square>
+    <Paper style={{ flexGrow: 1 }} variant="outlined" square>
       <List disablePadding>
         {messages.map((message) => (
           <Message key={message.id} message={message} />
         ))}
       </List>
       {(messages && loading) &&
-        Array(5).fill(0).map((_value, index) => (
-          <SkeletonMessage key={index} />
-        ))
+        <List disablePadding>
+          {Array(5).fill(0).map((_value, index) => (
+            <SkeletonMessage key={index} />
+          ))}
+        </List>
       }
       {hasMore ?
         <Button
