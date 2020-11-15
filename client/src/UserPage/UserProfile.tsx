@@ -14,6 +14,7 @@ import {
   Theme,
   IconButton,
   Tooltip,
+  Grid,
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import { Today as TodayIcon, ExitToApp } from '@material-ui/icons';
@@ -29,7 +30,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
       '& > *': {
-        margin: theme.spacing(1),
+        marginRight: theme.spacing(1),
       },
     },
     todayIcon: {
@@ -73,48 +74,53 @@ const UserProfile: React.FC<ProfileProps> = ({ user, owner, logout, token }) => 
 
   if (user) {
     return (
-      <Box display="flex"
-        flexWrap="wrap"
-        justifyContent="space-between"
-        alignItems="baseline"
-        padding={2}>
-        <div>
-          <Typography variant="h6">
-            {user.name}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            @{user.username}
-          </Typography>
-          <Typography variant="body2">
-            {user.description}
-          </Typography>
-          <Box display="flex" alignItems="center" paddingTop={1}>
-            <TodayIcon className={classes.todayIcon} />
-            <Typography variant="body2" color="textSecondary">
-              joined {dateString}
+      <Box padding={2}>
+        <Grid style={{ paddingBottom: '8px' }} container alignItems="baseline">
+          <Grid item xs>
+            <Typography noWrap variant="h6">
+              {user.name}
             </Typography>
-          </Box>
-        </div>
-        <Box className={classes.root} display="flex" flexDirection="row" alignItems="center">
-          {owner ?
-            <>
-              <Button onClick={handleOpen} variant="outlined" color="primary">edit profile</Button>
-              <UserModal
-                open={open}
-                handleOpen={handleOpen}
-                user={user}
-                handleSubmit={handleSubmit}
-              />
-              <Tooltip title="Logout" aria-label="logout">
-                <IconButton onClick={logout} color="primary">
-                  <ExitToApp />
-                </IconButton>
-              </Tooltip>
-            </> :
-            <Button variant="contained" color="primary">
-              follow
-            </Button>
-          }
+            <Typography noWrap variant="body2" color="textSecondary">
+              @{user.username}
+            </Typography>
+          </Grid>
+          <Grid item>
+            <Box className={classes.root} display="flex" flexDirection="row" alignItems="center">
+              {owner ?
+                <>
+                  <Button
+                    onClick={handleOpen}
+                    variant="outlined"
+                    color="primary">
+                    edit profile
+                  </Button>
+                  <UserModal
+                    open={open}
+                    handleOpen={handleOpen}
+                    user={user}
+                    handleSubmit={handleSubmit}
+                  />
+                  <Tooltip title="Logout" aria-label="logout">
+                    <IconButton onClick={logout} color="primary">
+                      <ExitToApp />
+                    </IconButton>
+                  </Tooltip>
+                </> :
+                <Button variant="contained" color="primary">
+                  follow
+                </Button>
+              }
+            </Box>
+          </Grid>
+        </Grid>
+        <Typography variant="body2">
+          {user.description}
+        </Typography>
+        <Box display="flex" alignItems="center" paddingTop={1}>
+          <TodayIcon className={classes.todayIcon} />
+          <Typography variant="body2" color="textSecondary">
+            joined {dateString}
+          </Typography>
         </Box>
       </Box>
     );
