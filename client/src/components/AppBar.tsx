@@ -1,5 +1,5 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useHistory } from 'react-router-dom';
 
 import { User } from '../types';
 
@@ -40,23 +40,23 @@ const useStyle = makeStyles((theme: Theme) =>
         marginLeft: theme.spacing(3),
         width: 'auto',
       },
+      display: 'flex',
+      alignItems: 'center',
     },
     searchIcon: {
       padding: theme.spacing(0, 2),
-      height: '100%',
-      position: 'absolute',
-      pointerEvents: 'none',
+      color: 'inherit',
+      border: 'none',
+      background: 'transparent',
+      outline: 'none',
+      cursor: 'pointer',
       display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
     },
     inputRoot: {
       color: 'inherit',
     },
     inputInput: {
       padding: theme.spacing(1, 1, 1, 0),
-      // vertical padding + font size from searchIcon
-      paddingLeft: `calc(1em + ${theme.spacing(4)}px)`,
       transition: theme.transitions.create('width'),
       width: '100%',
       [theme.breakpoints.up('md')]: {
@@ -72,6 +72,15 @@ const useStyle = makeStyles((theme: Theme) =>
 
 const AppBar: React.FC<{ user: User | null }> = ({ user }) => {
   const classes = useStyle();
+  const [input, setInput] = useState('');
+  const history = useHistory();
+
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (input.length > 0) {
+      history.push(`/u/${input}`);
+    }
+  };
 
   return (
     <MUIAppBar position="sticky" elevation={0}>
@@ -84,19 +93,21 @@ const AppBar: React.FC<{ user: User | null }> = ({ user }) => {
           to="/home">
           <HomeIcon />
         </IconButton>
-        <div className={classes.search}>
-          <div className={classes.searchIcon}>
+        <form className={classes.search} onSubmit={handleSubmit}>
+          <button type="submit" className={classes.searchIcon}>
             <SearchIcon />
-          </div>
+          </button>
           <InputBase
-            placeholder="Search…"
+            placeholder="Search user..."
             classes={{
               root: classes.inputRoot,
               input: classes.inputInput,
             }}
+            value={input}
+            onChange={({ target }) => setInput(target.value)}
             inputProps={{ 'aria-label': 'search' }}
           />
-        </div>
+        </form>
         <div className={classes.grow} />
         {user ?
           <Avatar
