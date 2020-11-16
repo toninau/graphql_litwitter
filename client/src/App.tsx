@@ -30,6 +30,7 @@ const App: React.FC = () => {
               authorization: `bearer ${token}`
             }
           },
+          fetchPolicy: 'no-cache'
         });
         setUser(data.me);
       } catch (error) {

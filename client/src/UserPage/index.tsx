@@ -44,6 +44,30 @@ const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
   });
   const classes = useStyles();
 
+  // Gets initial messages
+  useEffect(() => {
+    const fetchMessage = async () => {
+      const { data, loading } = await client.query<{ messages: MessageData }>({
+        query: USER_MESSAGES,
+        variables: {
+          username: match?.params.username,
+          offset: 0
+        },
+        fetchPolicy: 'no-cache'
+      });
+      setUserMessages({
+        messages: data.messages.messages,
+        hasMore: data.messages.hasMore,
+        loading
+      });
+    };
+    if (data?.user) {
+      void fetchMessage();
+      setOffset(0);
+    }
+  }, [data]);
+
+  // Gets more messages
   useEffect(() => {
     const fetchMessage = async () => {
       const { data, loading } = await client.query<{ messages: MessageData }>({
@@ -51,7 +75,8 @@ const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
         variables: {
           username: match?.params.username,
           offset
-        }
+        },
+        fetchPolicy: 'no-cache'
       });
       setUserMessages((prevMessages) => ({
         messages: prevMessages.messages.concat(data.messages.messages),
@@ -60,10 +85,9 @@ const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
       }));
     };
     if (userMessages.hasMore && data?.user) {
-      console.log('fetch messages');
       void fetchMessage();
     }
-  }, [offset, data]);
+  }, [offset]);
 
   const logout = () => {
     storage.removeToken();
