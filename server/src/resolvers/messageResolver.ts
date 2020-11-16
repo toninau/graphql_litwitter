@@ -42,6 +42,30 @@ export class MessageResolver {
   }
 
   @Query(() => PaginatedMessages)
+  async allMessages(
+    @Arg('options', { validate: true, nullable: true, defaultValue: { offset: 0, limit: 10 } }) options: OffsetLimitInput
+  ): Promise<PaginatedMessages> {
+
+    // One more message is returned than needed,
+    // to evaluate if more messages are available.
+    const realLimit = options.limit + 1;
+
+    const messages = await Message.find({
+      relations: ['user'],
+      order: {
+        createdAt: 'DESC'
+      },
+      skip: options.offset,
+      take: realLimit
+    });
+
+    return {
+      messages: messages.slice(0, options.limit),
+      hasMore: realLimit === messages.length
+    };
+  }
+
+  @Query(() => PaginatedMessages)
   async messages(
     @Arg('id', () => Int, { nullable: true }) id: number,
     @Arg('username', () => String, { nullable: true }) username: string,
