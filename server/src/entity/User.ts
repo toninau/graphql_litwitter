@@ -26,7 +26,7 @@ export class User extends BaseEntity {
   name?: string;
 
   @Field({ nullable: true })
-  @Column({ length: 140, nullable: true })
+  @Column({ length: 280, nullable: true })
   description?: string;
 
   @Field()
