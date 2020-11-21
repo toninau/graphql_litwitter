@@ -27,7 +27,7 @@ import {
 import {
   Search,
   PeopleAlt,
-  AccessTime,
+  Message as MessageIcon,
   Lock as LockIcon
 } from '@material-ui/icons';
 import { Alert, AlertTitle } from '@material-ui/lab';
@@ -49,7 +49,8 @@ const useStyles = makeStyles((theme: Theme) =>
       '& span, & svg': {
         color: 'white',
         fontSize: '1.5rem'
-      }
+      },
+      padding: theme.spacing(2, 0)
     },
     avatar: {
       backgroundColor: theme.palette.primary.main
@@ -71,16 +72,16 @@ const LandingPage: React.FC = () => {
 
   const landingList = [
     {
-      text: 'Chat',
+      text: 'Search for users',
       icon: <Search />
     },
     {
-      text: 'Follow',
+      text: 'Follow users',
       icon: <PeopleAlt />
     },
     {
-      text: 'Other stuff',
-      icon: <AccessTime />
+      text: 'Send and read messages',
+      icon: <MessageIcon />
     }
   ];
 

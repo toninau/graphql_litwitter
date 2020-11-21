@@ -16,8 +16,9 @@
 }
 
 .landing-page__section--background {
-  background-color: skyblue;
-  background-image: url(../img/Large-Triangles.svg);
+  background-color: #4b9fea;
+  background-image: url(../img/Subtle-Prism.svg);
+  /* background by SVGBackgrounds.com */
 }
 
 .landing-page__section--white {
