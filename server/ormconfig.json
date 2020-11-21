@@ -5,7 +5,7 @@
   "username": "postgres",
   "password": "root",
   "database": "chat",
-  "synchronize": true,
+  "synchronize": false,
   "logging": true,
   "entities": [
      "src/entity/**/*.ts"

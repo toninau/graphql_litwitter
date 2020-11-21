@@ -18,6 +18,8 @@ const PORT = process.env.PORT || '4000';
 const main = async () => {
   await createConnection();
 
+  // await conn.runMigrations();
+
   const app = express();
   app.set('trust proxy', 1);
   app.use(cors());
