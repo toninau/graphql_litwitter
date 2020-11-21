@@ -112,8 +112,7 @@ const UserPage: React.FC<UserPageProps> = ({ user, username }) => {
         {(username === user?.username) &&
           <SendMessage addMessage={addMessage} token={token} />
         }
-        <Divider variant="middle" light />
-
+        <Divider />
         <Box display="flex" justifyContent="center" alignItems="center" padding={1}>
           <MessageIcon className={classes.messageIcon} />
           <Typography variant="h6" color="primary">

@@ -38,7 +38,7 @@ const UserModal: React.FC<UserModalProps> = ({ open, handleOpen, user, handleSub
             if (values.name.length > 14) {
               errors.name = 'Name is too long';
             }
-            if (values.description.length > 140) {
+            if (values.description.length > 280) {
               errors.description = 'Description is too long';
             }
             return errors;

@@ -12,7 +12,8 @@ import {
   CircularProgress,
   makeStyles,
   Theme,
-  createStyles
+  createStyles,
+  Typography
 } from '@material-ui/core';
 import { Send as SendIcon } from '@material-ui/icons';
 
@@ -24,9 +25,8 @@ interface SendMessageProps {
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     button: {
-      margin: theme.spacing(1, 0), //tämä pois tai muuttaminen, kun siirretty alas
+      margin: theme.spacing(0, 1),
       padding: theme.spacing('6px', 3.5),
-      alignSelf: 'flex-end',
     },
   }),
 );
@@ -63,25 +63,32 @@ const SendMessage: React.FC<SendMessageProps> = ({ token, addMessage }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Box display="flex" alignItems="baseline" padding={2}>
-        <InputBase
-          placeholder="whats happening?"
-          fullWidth
-          multiline
-          value={input}
-          onChange={({ target }) => setInput(target.value)}
-        />
-        <Divider flexItem orientation="vertical" light variant="middle" />
-        <Button
-          className={classes.button}
-          type="submit"
-          variant="contained"
-          color="primary"
-          disabled={loading || !input}
-          endIcon={!loading && <SendIcon />}>
-          {loading ? <CircularProgress color="inherit" size={24} /> : 'send'}
-        </Button>
-      </Box>
+      <div>
+        <div style={{ margin: '16px' }}>
+          <InputBase
+            placeholder="whats happening?"
+            fullWidth
+            multiline
+            value={input}
+            onChange={({ target }) => setInput(target.value)}
+          />
+        </div>
+        <Divider light variant="middle" />
+        <Box display="flex" justifyContent="flex-end" padding={1} alignItems="center">
+          <Typography variant="body2" color={input.length > 280 ? 'error' : 'textPrimary'}>
+            {input.length}/280
+          </Typography>
+          <Button
+            className={classes.button}
+            type="submit"
+            variant="contained"
+            color="primary"
+            disabled={loading || !input || input.length > 280}
+            endIcon={!loading && <SendIcon />}>
+            {loading ? <CircularProgress color="inherit" size={24} /> : 'send'}
+          </Button>
+        </Box>
+      </div>
     </form>
   );
 };

@@ -83,8 +83,7 @@ const HomePage: React.FC<{ user: User | null }> = ({ user }) => {
             <SendMessage addMessage={addMessage} token={token} />
           </>
         }
-        <Divider variant="middle" light />
-
+        <Divider />
         <Box display="flex" justifyContent="center" alignItems="center" padding={1}>
           <MessageIcon className={classes.messageIcon} />
           <Typography variant="h6" color="primary">
