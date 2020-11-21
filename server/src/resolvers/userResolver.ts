@@ -87,13 +87,14 @@ export class UserResolver {
       return { errors };
     }
     const hashedPassword = await argon2.hash(options.password);
-    const userToCreate = User.create({
-      username: options.username,
-      name: options.username,
-      password: hashedPassword
-    });
+
     let user;
     try {
+      const userToCreate = User.create({
+        username: options.username,
+        name: options.username,
+        password: hashedPassword
+      });
       user = await User.save(userToCreate);
     } catch (err) {
       return {

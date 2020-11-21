@@ -4,30 +4,16 @@ import { Form, Formik } from 'formik';
 import { FormikTextField } from '../components/FormField';
 import { AccountValues } from '../types';
 
-import { Button, Box, Typography, CircularProgress, Avatar } from '@material-ui/core';
-import { Lock as LockIcon } from '@material-ui/icons';
+import { Button, Box, CircularProgress } from '@material-ui/core';
 
 interface AccountProps {
   handleSubmit: (values: AccountValues) => void;
-  text: string;
   loading: boolean;
 }
 
-const AccountForm: React.FC<AccountProps> = ({ handleSubmit, text, loading }) => {
+const AccountForm: React.FC<AccountProps> = ({ handleSubmit, loading }) => {
   return (
     <>
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        paddingBottom={3}>
-        <Avatar style={{ backgroundColor: 'green' }}>
-          <LockIcon />
-        </Avatar>
-        <Typography align="center" variant="h4">
-          {text}
-        </Typography>
-      </Box>
       <Formik
         initialValues={{
           username: '',

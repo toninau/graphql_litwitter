@@ -11,7 +11,9 @@ import storage from '../storage';
 import './landingPage.css';
 
 import {
+  Avatar,
   Box,
+  createStyles,
   Grid,
   Link,
   List,
@@ -19,8 +21,17 @@ import {
   ListItemIcon,
   ListItemText,
   makeStyles,
+  Theme,
+  Typography,
 } from '@material-ui/core';
-import { Search, PeopleAlt, AccessTime } from '@material-ui/icons';
+import {
+  Search,
+  PeopleAlt,
+  AccessTime,
+  Lock as LockIcon
+} from '@material-ui/icons';
+import { Alert, AlertTitle } from '@material-ui/lab';
+
 
 type FieldError = {
   field: string;
@@ -32,14 +43,22 @@ interface Data {
   value?: string;
 }
 
-const useStyles = makeStyles({
-  item: {
-    '& span, & svg': {
-      color: 'white',
-      fontSize: '1.5rem'
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    item: {
+      '& span, & svg': {
+        color: 'white',
+        fontSize: '1.5rem'
+      }
+    },
+    avatar: {
+      backgroundColor: theme.palette.primary.main
+    },
+    alert: {
+      marginBottom: theme.spacing(3)
     }
-  }
-});
+  }),
+);
 
 const LandingPage: React.FC = () => {
   const [loginUser, { loading: loginLoading }] = useMutation<{ login: Data }>(LOGIN_USER);
@@ -123,9 +142,26 @@ const LandingPage: React.FC = () => {
           flexDirection="column"
           width="300px">
           <Box paddingBottom={2}>
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              paddingBottom={3}>
+              <Avatar className={classes.avatar}>
+                <LockIcon />
+              </Avatar>
+              <Typography align="center" variant="h4">
+                {logIn ? 'Log In' : 'Sign Up'}
+              </Typography>
+            </Box>
+            {errors &&
+              <Alert className={classes.alert} severity="error" onClose={() => setErrors(null)}>
+                <AlertTitle>{errors[0].field}</AlertTitle>
+                {errors[0].message}
+              </Alert>
+            }
             <AccountForm
               handleSubmit={logIn ? handleLogIn : handleSignUp}
-              text={logIn ? 'Log In' : 'Sign Up'}
               loading={loginLoading || signupLoading}
             />
           </Box>
@@ -142,9 +178,6 @@ const LandingPage: React.FC = () => {
             </Grid>
           </Grid>
         </Box>
-        {errors &&
-          <p>{errors[0].message}</p>
-        }
       </div>
     </div >
   );
