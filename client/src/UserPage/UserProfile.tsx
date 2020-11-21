@@ -127,9 +127,23 @@ const UserProfile: React.FC<ProfileProps> = ({ user, owner, logout, token }) => 
   }
 
   return (
-    <div>
-      <Skeleton variant="rect" width={210} height={210} />
-    </div>
+    <Box padding={2}>
+      <Typography noWrap variant="h6">
+        <Skeleton width={100} />
+      </Typography>
+      <Typography noWrap variant="body2">
+        <Skeleton width={50} />
+      </Typography>
+      <Typography variant="body2">
+        <Skeleton width={350} />
+      </Typography>
+      <Box display="flex" alignItems="center" paddingTop={1}>
+        <Skeleton width={24} height={24} className={classes.todayIcon} />
+        <Typography variant="body2">
+          <Skeleton width={100} />
+        </Typography>
+      </Box>
+    </Box>
   );
 };
 
