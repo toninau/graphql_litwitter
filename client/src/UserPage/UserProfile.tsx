@@ -113,7 +113,7 @@ const UserProfile: React.FC<ProfileProps> = ({ user, owner, logout, token }) => 
             </Box>
           </Grid>
         </Grid>
-        <Typography variant="body2">
+        <Typography variant="body2" style={{ overflowWrap: 'break-word' }}>
           {user.description}
         </Typography>
         <Box display="flex" alignItems="center" paddingTop={1}>

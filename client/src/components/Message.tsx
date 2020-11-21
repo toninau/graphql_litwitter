@@ -46,6 +46,7 @@ const Message: React.FC<{ message: MessageType }> = ({ message }) => {
           }
           secondary={
             <Typography
+              style={{ overflowWrap: 'break-word' }}
               variant="body2"
               color="textPrimary">
               {message.text}
