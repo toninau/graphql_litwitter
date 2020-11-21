@@ -64,8 +64,11 @@ const useStyle = makeStyles((theme: Theme) =>
       },
     },
     avatar: {
-      backgroundColor: theme.palette.secondary.light,
+      backgroundColor: theme.palette.secondary.main,
       textDecoration: 'none'
+    },
+    loginButton: {
+      padding: theme.spacing('6px', 3.5)
     }
   })
 );
@@ -83,7 +86,7 @@ const AppBar: React.FC<{ user: User | null }> = ({ user }) => {
   };
 
   return (
-    <MUIAppBar position="sticky" elevation={0}>
+    <MUIAppBar position="fixed" elevation={0}>
       <Toolbar>
         <IconButton
           color="inherit"
@@ -117,6 +120,7 @@ const AppBar: React.FC<{ user: User | null }> = ({ user }) => {
             {user.username.substring(0, 1).toUpperCase()}
           </Avatar> :
           <Button
+            className={classes.loginButton}
             variant="outlined"
             color="inherit"
             startIcon={<AccountCircle />}

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-
 import { useMutation } from '@apollo/client';
+
 import { SEND_MESSAGE } from '../queries/messageQueries';
+import { Message } from '../types';
 
 import {
   InputBase,
@@ -15,17 +16,23 @@ import {
 } from '@material-ui/core';
 import { Send as SendIcon } from '@material-ui/icons';
 
+interface SendMessageProps {
+  token: string;
+  addMessage: (message: Message) => void;
+}
+
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     button: {
-      margin: theme.spacing(1),
+      margin: theme.spacing(1, 0), //tämä pois tai muuttaminen, kun siirretty alas
+      padding: theme.spacing('6px', 3.5),
       alignSelf: 'flex-end',
     },
   }),
 );
 
-const SendMessage: React.FC<{ token: string }> = ({ token }) => {
-  const [sendMessage, { loading }] = useMutation(SEND_MESSAGE);
+const SendMessage: React.FC<SendMessageProps> = ({ token, addMessage }) => {
+  const [sendMessage, { loading }] = useMutation<{ addMessage: Message }>(SEND_MESSAGE);
   const [input, setInput] = useState('');
   const classes = useStyles();
 
@@ -33,7 +40,7 @@ const SendMessage: React.FC<{ token: string }> = ({ token }) => {
     event.preventDefault();
     if (input.length > 0) {
       try {
-        const data = await sendMessage({
+        const { data } = await sendMessage({
           context: {
             headers: {
               authorization: `bearer ${token}`
@@ -44,6 +51,9 @@ const SendMessage: React.FC<{ token: string }> = ({ token }) => {
           }
         });
         console.log(data);
+        if (data?.addMessage) {
+          addMessage(data.addMessage);
+        }
       } catch (error) {
         console.log(error);
       }

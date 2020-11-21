@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 import { Message as MessageType } from '../types';
 
@@ -21,7 +22,10 @@ const Message: React.FC<{ message: MessageType }> = ({ message }) => {
     <>
       <ListItem alignItems="flex-start">
         <ListItemAvatar>
-          <Avatar>
+          <Avatar
+            style={{ textDecoration: 'none' }}
+            component={Link}
+            to={`/u/${message.user.username}`}>
             {message.user.username.substring(0, 1).toUpperCase()}
           </Avatar>
         </ListItemAvatar>

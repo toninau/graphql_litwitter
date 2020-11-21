@@ -29,6 +29,7 @@ export const ME_USER = gql`
     me {
       id
       username
+      name
       description
     }
   }

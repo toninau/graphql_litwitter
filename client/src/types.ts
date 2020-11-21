@@ -20,3 +20,8 @@ export type Message = {
     name: string;
   }
 };
+
+export interface MessageData {
+  hasMore: boolean;
+  messages: Array<Message>;
+}

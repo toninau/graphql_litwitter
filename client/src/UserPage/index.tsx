@@ -1,24 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { useRouteMatch } from 'react-router-dom';
 import { useQuery, useApolloClient } from '@apollo/client';
 
 import { USER_MESSAGES } from '../queries/messageQueries';
 import { FETCH_USER } from '../queries/userQueries';
-import { User, Message } from '../types';
+import { User, Message, MessageData } from '../types';
 import { useStateValue } from '../state';
 import storage from '../storage';
 
 import UserProfile from './UserProfile';
 import SendMessage from '../components/SendMessage';
-import UserMessages from './UserMessages';
+import Messages from '../components/Messages';
 
 import { Box, Container, createStyles, Divider, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
 import { Message as MessageIcon } from '@material-ui/icons';
-
-interface MessageData {
-  hasMore: boolean;
-  messages: Array<Message>;
-}
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -29,12 +23,16 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
-  const match = useRouteMatch<{ username: string }>('/u/:username');
+interface UserPageProps {
+  user: User | null;
+  username: string | undefined;
+}
+
+const UserPage: React.FC<UserPageProps> = ({ user, username }) => {
   const [token, setToken] = useStateValue();
   const client = useApolloClient();
   const { loading, data } = useQuery<{ user: User }>(
-    FETCH_USER, { variables: { username: match?.params.username } }
+    FETCH_USER, { variables: { username: username } }
   );
   const [offset, setOffset] = useState(0);
   const [userMessages, setUserMessages] = useState<MessageData & { loading: boolean }>({
@@ -44,50 +42,42 @@ const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
   });
   const classes = useStyles();
 
-  // Gets initial messages
+  const fetchMessage = async (offset: number) => {
+    const { data, loading } = await client.query<{ messages: MessageData }>({
+      query: USER_MESSAGES,
+      variables: {
+        username: username,
+        offset
+      },
+      fetchPolicy: 'no-cache'
+    });
+    setUserMessages((prevMessages) => ({
+      messages: prevMessages.messages.concat(data.messages.messages),
+      hasMore: data.messages.hasMore,
+      loading
+    }));
+  };
+
+  // When user changes, reset offset and usermessages.
+  // If user is found, fetch first messages
   useEffect(() => {
-    const fetchMessage = async () => {
-      const { data, loading } = await client.query<{ messages: MessageData }>({
-        query: USER_MESSAGES,
-        variables: {
-          username: match?.params.username,
-          offset: 0
-        },
-        fetchPolicy: 'no-cache'
-      });
-      setUserMessages({
-        messages: data.messages.messages,
-        hasMore: data.messages.hasMore,
-        loading
-      });
-    };
+    setOffset(0);
+    setUserMessages({
+      messages: [],
+      hasMore: true,
+      loading: true,
+    });
     if (data?.user) {
-      void fetchMessage();
-      setOffset(0);
+      void fetchMessage(0);
     }
   }, [data]);
 
-  // Gets more messages
-  useEffect(() => {
-    const fetchMessage = async () => {
-      const { data, loading } = await client.query<{ messages: MessageData }>({
-        query: USER_MESSAGES,
-        variables: {
-          username: match?.params.username,
-          offset
-        },
-        fetchPolicy: 'no-cache'
-      });
-      setUserMessages((prevMessages) => ({
-        messages: prevMessages.messages.concat(data.messages.messages),
-        hasMore: data.messages.hasMore,
-        loading
-      }));
-    };
-    if (userMessages.hasMore && data?.user) {
-      void fetchMessage();
-    }
-  }, [offset]);
+  const addMessage = (message: Message) => {
+    setUserMessages(prevUserMessages => ({
+      ...prevUserMessages,
+      messages: [message, ...prevUserMessages.messages]
+    }));
+  };
 
   const logout = () => {
     storage.removeToken();
@@ -95,8 +85,9 @@ const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
   };
 
   const getMore = () => {
-    setOffset(prevOffeset => prevOffeset + 5);
     setUserMessages(prevUserMessages => ({ ...prevUserMessages, loading: true }));
+    void fetchMessage(offset + 5);
+    setOffset(prevOffeset => prevOffeset + 5);
   };
 
   if (!loading && !data?.user) {
@@ -108,17 +99,18 @@ const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
   return (
     <Container
       style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}
-      maxWidth="sm">
+      maxWidth="sm"
+      disableGutters>
       <Paper variant="outlined" square>
         <UserProfile
           user={data?.user}
-          owner={match?.params.username === user?.username}
+          owner={username === user?.username}
           logout={logout}
           token={token}
         />
         <Divider variant="middle" light />
-        {(match?.params.username === user?.username) &&
-          <SendMessage token={token} />
+        {(username === user?.username) &&
+          <SendMessage addMessage={addMessage} token={token} />
         }
         <Divider variant="middle" light />
 
@@ -129,7 +121,7 @@ const UserPage: React.FC<{ user: User | null }> = ({ user }) => {
           </Typography>
         </Box>
       </Paper>
-      <UserMessages
+      <Messages
         messages={userMessages.messages}
         loading={userMessages.loading}
         hasMore={userMessages.hasMore}

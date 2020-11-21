@@ -8,6 +8,7 @@ export const SEND_MESSAGE = gql`
       createdAt
       user {
         username
+        name
       }
     }
   }
@@ -16,6 +17,23 @@ export const SEND_MESSAGE = gql`
 export const USER_MESSAGES = gql`
   query messages($username: String!, $offset: Int){
     messages(username: $username, options: { offset: $offset, limit: 5 }) {
+      messages {
+        createdAt
+        id
+        text
+        user {
+          username
+          name
+        }
+      }
+      hasMore
+    }
+  }
+`;
+
+export const ALL_MESSAGES = gql`
+  query allMessages($offset: Int) {
+    allMessages(options: { offset: $offset, limit: 5 }) {
       messages {
         createdAt
         id

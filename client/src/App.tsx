@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
+import { Switch, Route, Redirect, useLocation, useRouteMatch } from 'react-router-dom';
 import { useApolloClient } from '@apollo/client';
 
 import LandingPage from './LandingPage';
@@ -12,7 +12,7 @@ import { useStateValue } from './state';
 import { User } from './types';
 import { ME_USER } from './queries/userQueries';
 
-import { CssBaseline } from '@material-ui/core';
+import { CssBaseline, Toolbar } from '@material-ui/core';
 
 const App: React.FC = () => {
   const client = useApolloClient();
@@ -47,19 +47,23 @@ const App: React.FC = () => {
     }
   }, [token]);
 
+  const match = useRouteMatch<{ username: string }>('/u/:username');
+
   return (
     <>
+      <ScrollToTop />
       <CssBaseline />
       <AppBar user={user} />
+      <Toolbar />
       <Switch>
         <Route exact path="/">
           {!token ? <LandingPage /> : <Redirect to="/home" />}
         </Route>
         <Route path="/home">
-          <HomePage />
+          <HomePage user={user} />
         </Route>
         <Route path="/u/:username">
-          <UserPage user={user} />
+          <UserPage user={user} username={match?.params.username} />
         </Route>
         <Route path="*">
           <p>page not found</p>
@@ -67,6 +71,15 @@ const App: React.FC = () => {
       </Switch>
     </>
   );
+};
+
+const ScrollToTop: React.FC = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
 };
 
 export default App;
