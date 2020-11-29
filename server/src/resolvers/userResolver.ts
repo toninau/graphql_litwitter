@@ -42,16 +42,36 @@ class UserResponse {
   value?: string;
 }
 
+@ObjectType()
+class UserWithFollowCounts extends User {
+  @Field(() => Int)
+  followsCount!: number;
+  @Field(() => Int)
+  followersCount!: number;
+}
+
 const SECRET = process.env.SECRET || 'TEMP_VALUE';
 
 @Resolver(() => User)
 export class UserResolver {
-  @Query(() => User, { nullable: true })
-  user(
+  @Query(() => UserWithFollowCounts, { nullable: true })
+  async user(
     @Arg('id', () => Int, { nullable: true }) id: number,
     @Arg('username', () => String, { nullable: true }) username: string
   ): Promise<User | undefined> {
-    return id ? User.findOne(id) : User.findOne({ where: { username } });
+
+    const { string, value } = id ?
+      { string: 'user.id = :id', value: { id } } :
+      { string: 'user.username = :username', value: { username } };
+
+    const result = await User
+      .createQueryBuilder('user')
+      .loadRelationCountAndMap('user.followsCount', 'user.follows')
+      .loadRelationCountAndMap('user.followersCount', 'user.followers')
+      .where(string, value)
+      .getOne();
+
+    return result;
   }
 
   @Query(() => User, { nullable: true })

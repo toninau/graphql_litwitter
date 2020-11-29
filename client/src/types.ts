@@ -11,6 +11,11 @@ export type User = {
   createdAt: string;
 };
 
+export type UserWithFollowCounts = User & {
+  followsCount: number;
+  followersCount: number;
+};
+
 export type Message = {
   id: number;
   text: string;

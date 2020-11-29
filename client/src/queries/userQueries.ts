@@ -43,6 +43,8 @@ export const FETCH_USER = gql`
       description
       name
       createdAt
+      followsCount
+      followersCount
     }
   }
 `;

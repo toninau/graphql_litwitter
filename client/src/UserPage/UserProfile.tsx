@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
 
-import { User } from '../types';
+import { UserWithFollowCounts, User } from '../types';
 import { UPDATE_USER } from '../queries/userQueries';
 import UserModal from './UserModal';
 
@@ -20,7 +20,7 @@ import { Skeleton } from '@material-ui/lab';
 import { Today as TodayIcon, ExitToApp } from '@material-ui/icons';
 
 interface ProfileProps {
-  user: User | undefined;
+  user: UserWithFollowCounts | undefined;
   owner: boolean;
   logout: () => void;
   token: string;
@@ -44,6 +44,8 @@ const UserProfile: React.FC<ProfileProps> = ({ user, owner, logout, token }) => 
   const classes = useStyles();
   const [open, setOpen] = useState(false);
   const [updateUser] = useMutation<{ updateUser: User }>(UPDATE_USER);
+
+  console.log(user);
 
   const dateString = new Intl
     .DateTimeFormat('en-US', { month: 'long', year: 'numeric' })
@@ -120,6 +122,20 @@ const UserProfile: React.FC<ProfileProps> = ({ user, owner, logout, token }) => 
           <TodayIcon className={classes.todayIcon} />
           <Typography variant="body2" color="textSecondary">
             joined {dateString}
+          </Typography>
+        </Box>
+        <Box display="flex" alignItems="center" paddingTop={1}>
+          <Typography variant="body1" style={{ paddingRight: '2px' }}>
+            {user.followersCount}
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            followers
+          </Typography>
+          <Typography variant="body1" style={{ padding: '0 2px 0 10px' }}>
+            {user.followsCount}
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            following
           </Typography>
         </Box>
       </Box>

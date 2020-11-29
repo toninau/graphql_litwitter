@@ -8,6 +8,7 @@ import {
   CreateDateColumn,
 } from 'typeorm';
 import { Message } from './Message';
+import { Follow } from './Follow';
 
 @ObjectType()
 @Entity()
@@ -38,4 +39,10 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Message, message => message.user)
   messages!: Message[];
+
+  @OneToMany(() => Follow, follow => follow.follower)
+  follows!: Follow[];
+
+  @OneToMany(() => Follow, follow => follow.followsTo)
+  followers!: Follow[];
 }

@@ -8,6 +8,7 @@ import { verify } from 'jsonwebtoken';
 
 import { MessageResolver } from './resolvers/messageResolver';
 import { UserResolver } from './resolvers/userResolver';
+import { FollowResolver } from './resolvers/followResolver';
 
 import { User } from './entity/User';
 import { TokenInterface } from './types';
@@ -26,7 +27,7 @@ const main = async () => {
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [MessageResolver, UserResolver],
+      resolvers: [MessageResolver, UserResolver, FollowResolver],
       validate: false
     }),
     context: async ({ req }) => {
