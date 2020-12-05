@@ -17,6 +17,7 @@ import { authChecker } from '../middleware/authChecker';
 import { MyContext } from '../types';
 import { User } from '../entity/User';
 import { registerValidation } from '../utils/registerValidation';
+import { Follow } from '../entity/Follow';
 
 @InputType()
 export class UsernamePasswordInput {
@@ -43,26 +44,42 @@ class UserResponse {
 }
 
 @ObjectType()
-class UserWithFollowCounts extends User {
+class UserWithExtra extends User {
   @Field(() => Int)
   followsCount!: number;
   @Field(() => Int)
   followersCount!: number;
+  @Field()
+  following!: boolean;
 }
 
 const SECRET = process.env.SECRET || 'TEMP_VALUE';
 
 @Resolver(() => User)
 export class UserResolver {
-  @Query(() => UserWithFollowCounts, { nullable: true })
+  @Query(() => UserWithExtra, { nullable: true })
   async user(
     @Arg('id', () => Int, { nullable: true }) id: number,
-    @Arg('username', () => String, { nullable: true }) username: string
-  ): Promise<User | undefined> {
+    @Arg('username', () => String, { nullable: true }) username: string,
+    @Ctx() { currentUser }: MyContext
+  ): Promise<UserWithExtra | undefined> {
 
     const { string, value } = id ?
       { string: 'user.id = :id', value: { id } } :
       { string: 'user.username = :username', value: { username } };
+
+    // Check if currentUser is following user
+    let following = false;
+    if (currentUser) {
+      const follows = await Follow
+        .createQueryBuilder('follow')
+        .leftJoinAndSelect('follow.followsTo', 'user')
+        .where('follow.follower = :id', { id: currentUser.id })
+        .getMany();
+
+      following = follows.some((follow) => follow.followsTo.id === id ||
+        follow.followsTo.username === username);
+    }
 
     const result = await User
       .createQueryBuilder('user')
@@ -71,7 +88,12 @@ export class UserResolver {
       .where(string, value)
       .getOne();
 
-    return result;
+    const userToReturn = ({
+      ...result,
+      following
+    } as UserWithExtra);
+
+    return userToReturn;
   }
 
   @Query(() => User, { nullable: true })

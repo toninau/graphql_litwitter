@@ -14,6 +14,7 @@ import { Max, Min } from 'class-validator';
 
 import { authChecker } from '../middleware/authChecker';
 import { Message } from '../entity/Message';
+import { Follow } from '../entity/Follow';
 import { MyContext } from '../types';
 
 @InputType()
@@ -63,6 +64,39 @@ export class MessageResolver {
       messages: messages.slice(0, options.limit),
       hasMore: realLimit === messages.length
     };
+  }
+
+  @Query(() => PaginatedMessages, { nullable: true })
+  async followMessages(
+    @Ctx() { currentUser }: MyContext,
+    @Arg('options', { validate: true, nullable: true, defaultValue: { offset: 0, limit: 10 } }) options: OffsetLimitInput
+  ): Promise<PaginatedMessages | undefined> {
+    const realLimit = options.limit + 1;
+
+    if (currentUser) {
+      // Gets users that currentUser is following
+      const followsTo = await Follow
+        .createQueryBuilder('follow')
+        .leftJoinAndSelect('follow.followsTo', 'user')
+        .where('follow.follower = :id', { id: currentUser.id })
+        .getMany();
+
+      // Gets followed users messages
+      const messages = await Message
+        .createQueryBuilder('message')
+        .offset(options.offset)
+        .limit(realLimit)
+        .leftJoinAndSelect('message.user', 'user')
+        .where('user.id IN (:...ids)', { ids: followsTo.map((follow) => follow.followsTo.id) })
+        .orderBy('message.createdAt', 'DESC')
+        .getMany();
+
+      return {
+        messages: messages.slice(0, options.limit),
+        hasMore: realLimit === messages.length
+      };
+    }
+    return undefined;
   }
 
   @Query(() => PaginatedMessages)

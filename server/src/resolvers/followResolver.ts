@@ -32,7 +32,6 @@ export class FollowResolver {
       .leftJoinAndSelect('follow.followsTo', 'user')
       .where('follow.follower = :id', { id })
       .getMany();
-    console.log(followsTo);
     return followsTo;
   }
 
@@ -45,18 +44,24 @@ export class FollowResolver {
       .leftJoinAndSelect('follow.follower', 'user')
       .where('follow.followsTo = :id', { id: id })
       .getMany();
-    console.log(followers);
     return followers;
   }
 
-  @Mutation(() => Follow)
+  @Mutation(() => Follow, { nullable: true })
   @UseMiddleware(authChecker)
   async followUser(
     @Arg('id', () => Int) id: number,
     @Ctx() { currentUser }: MyContext
   ): Promise<Follow | undefined> {
     const followedUser = await User.findOne(id);
-    if (followedUser && followedUser.id !== currentUser.id) {
+    const followsTo = await Follow
+      .createQueryBuilder('follow')
+      .leftJoinAndSelect('follow.followsTo', 'user')
+      .where('follow.follower = :id', { id: currentUser.id })
+      .getMany();
+
+    if (followedUser && followedUser.id !== currentUser.id &&
+      !followsTo.some((follow) => follow.followsTo.id === id)) {
       const follow = Follow.create({
         follower: currentUser,
         followsTo: followedUser
