@@ -45,6 +45,7 @@ export const FETCH_USER = gql`
       createdAt
       followsCount
       followersCount
+      following
     }
   }
 `;

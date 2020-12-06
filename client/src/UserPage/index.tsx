@@ -3,7 +3,7 @@ import { useQuery, useApolloClient } from '@apollo/client';
 
 import { USER_MESSAGES } from '../queries/messageQueries';
 import { FETCH_USER } from '../queries/userQueries';
-import { User, Message, MessageData, UserWithFollowCounts } from '../types';
+import { User, Message, MessageData, UserWithExtra } from '../types';
 import { useStateValue } from '../state';
 import storage from '../storage';
 
@@ -31,9 +31,14 @@ interface UserPageProps {
 const UserPage: React.FC<UserPageProps> = ({ user, username }) => {
   const [token, setToken] = useStateValue();
   const client = useApolloClient();
-  const { loading, data } = useQuery<{ user: UserWithFollowCounts }>(
-    FETCH_USER, { variables: { username: username } }
-  );
+  const { loading, data } = useQuery<{ user: UserWithExtra }>(FETCH_USER, {
+    variables: { username: username },
+    context: {
+      headers: {
+        authorization: `bearer ${token}`
+      }
+    },
+  });
   const [offset, setOffset] = useState(0);
   const [userMessages, setUserMessages] = useState<MessageData & { loading: boolean }>({
     messages: [],

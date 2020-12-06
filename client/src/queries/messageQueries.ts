@@ -47,3 +47,20 @@ export const ALL_MESSAGES = gql`
     }
   }
 `;
+
+export const FOLLOW_MESSAGES = gql`
+  query followMessages($offset: Int) {
+    followMessages(options: { offset: $offset, limit: 5 }) {
+      messages {
+        createdAt
+        id
+        text
+        user {
+          username
+          name
+        }
+      }
+      hasMore
+    }
+  }
+`;

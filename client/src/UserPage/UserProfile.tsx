@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { useMutation } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client';
 
-import { UserWithFollowCounts, User } from '../types';
+import { UserWithExtra, User, Follower, FollowsTo } from '../types';
 import { UPDATE_USER } from '../queries/userQueries';
+import { FOLLOWERS, FOLLOWS_TO } from '../queries/followQueries';
+
 import UserModal from './UserModal';
+import FollowModal from './FollowModal';
 
 import {
   Button,
@@ -15,12 +18,13 @@ import {
   IconButton,
   Tooltip,
   Grid,
+  Link
 } from '@material-ui/core';
 import { Skeleton } from '@material-ui/lab';
 import { Today as TodayIcon, ExitToApp } from '@material-ui/icons';
 
 interface ProfileProps {
-  user: UserWithFollowCounts | undefined;
+  user: UserWithExtra | undefined;
   owner: boolean;
   logout: () => void;
   token: string;
@@ -42,17 +46,29 @@ const useStyles = makeStyles((theme: Theme) =>
 
 const UserProfile: React.FC<ProfileProps> = ({ user, owner, logout, token }) => {
   const classes = useStyles();
-  const [open, setOpen] = useState(false);
+  const [openUserModal, setOpenUserModal] = useState(false);
+  const [openFollowerModal, setOpenFollowerModal] = useState(false);
+  const [openFollowsToModal, setOpenFollowsToModal] = useState(false);
   const [updateUser] = useMutation<{ updateUser: User }>(UPDATE_USER);
-
-  console.log(user);
+  const [getFollowers, { loading, data }] = useLazyQuery<{ followers: Follower[] }>(FOLLOWERS);
+  const [getFollowing, { loading: loading2, data: data2 }] = useLazyQuery<{ followsTo: FollowsTo[] }>(FOLLOWS_TO);
 
   const dateString = new Intl
     .DateTimeFormat('en-US', { month: 'long', year: 'numeric' })
     .format(Date.parse(user?.createdAt || '0'));
 
-  const handleOpen = () => {
-    setOpen(prevOpen => !prevOpen);
+  const handleOpenUserModal = () => {
+    setOpenUserModal(prevOpen => !prevOpen);
+  };
+
+  const handleOpenFollowModal = (followType?: string) => {
+    if (followType === 'followers') {
+      setOpenFollowerModal(true);
+      getFollowers({ variables: { id: user?.id } });
+    } else {
+      setOpenFollowsToModal(true);
+      getFollowing({ variables: { id: user?.id } });
+    }
   };
 
   const handleSubmit = async (name: string, description: string) => {
@@ -91,14 +107,14 @@ const UserProfile: React.FC<ProfileProps> = ({ user, owner, logout, token }) => 
               {owner ?
                 <>
                   <Button
-                    onClick={handleOpen}
+                    onClick={handleOpenUserModal}
                     variant="outlined"
                     color="primary">
                     edit profile
                   </Button>
                   <UserModal
-                    open={open}
-                    handleOpen={handleOpen}
+                    open={openUserModal}
+                    handleOpen={handleOpenUserModal}
                     user={user}
                     handleSubmit={handleSubmit}
                   />
@@ -109,7 +125,7 @@ const UserProfile: React.FC<ProfileProps> = ({ user, owner, logout, token }) => 
                   </Tooltip>
                 </> :
                 <Button variant="contained" color="primary">
-                  follow
+                  {user.following ? 'unfollow' : 'follow'}
                 </Button>
               }
             </Box>
@@ -125,19 +141,41 @@ const UserProfile: React.FC<ProfileProps> = ({ user, owner, logout, token }) => 
           </Typography>
         </Box>
         <Box display="flex" alignItems="center" paddingTop={1}>
-          <Typography variant="body1" style={{ paddingRight: '2px' }}>
-            {user.followersCount}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            followers
-          </Typography>
-          <Typography variant="body1" style={{ padding: '0 2px 0 10px' }}>
-            {user.followsCount}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            following
-          </Typography>
+          <Link onClick={() => handleOpenFollowModal('followers')} color="textPrimary" style={{ cursor: 'pointer' }}>
+            <Box paddingRight={1}>
+              <Typography variant="body1" color="textPrimary">
+                {user.followersCount}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                followers
+              </Typography>
+            </Box>
+          </Link>
+          <Link onClick={() => handleOpenFollowModal()} color="textPrimary" style={{ cursor: 'pointer' }}>
+            <Box paddingLeft={1}>
+              <Typography variant="body1" color="textPrimary">
+                {user.followsCount}
+              </Typography>
+              <Typography variant="body2" color="textSecondary">
+                following
+              </Typography>
+            </Box>
+          </Link>
         </Box>
+        <FollowModal
+          open={openFollowerModal}
+          handleClose={() => setOpenFollowerModal(false)}
+          loading={loading}
+          followers={data?.followers}
+          text="Followers"
+        />
+        <FollowModal
+          open={openFollowsToModal}
+          handleClose={() => setOpenFollowsToModal(false)}
+          loading={loading2}
+          following={data2?.followsTo}
+          text="Following"
+        />
       </Box>
     );
   }

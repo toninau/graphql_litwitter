@@ -11,9 +11,10 @@ export type User = {
   createdAt: string;
 };
 
-export type UserWithFollowCounts = User & {
+export type UserWithExtra = User & {
   followsCount: number;
   followersCount: number;
+  following: boolean;
 };
 
 export type Message = {
@@ -30,3 +31,21 @@ export interface MessageData {
   hasMore: boolean;
   messages: Array<Message>;
 }
+
+export type FollowsTo = {
+  followedAt: string;
+  followsTo: {
+    name: string;
+    username: string;
+    id: number
+  }
+};
+
+export type Follower = {
+  followedAt: string;
+  follower: {
+    name: string;
+    username: string;
+    id: number
+  }
+};
