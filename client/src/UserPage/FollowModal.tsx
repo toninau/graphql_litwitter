@@ -1,6 +1,8 @@
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 
 import { FollowsTo, Follower } from '../types';
+import FollowListUser from './FollowListUser';
 
 import {
   Dialog,
@@ -10,11 +12,6 @@ import {
   IconButton,
   DialogContent,
   List,
-  Avatar,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Divider,
   CircularProgress
 } from '@material-ui/core';
 import { Close as CloseIcon } from '@material-ui/icons';
@@ -29,6 +26,12 @@ interface FollowModalProps {
 }
 
 const FollowModal: React.FC<FollowModalProps> = ({ open, handleClose, loading, followers, following, text }) => {
+  const history = useHistory();
+
+  const goToUser = (username: string) => {
+    handleClose();
+    history.push(`/u/${username}`);
+  };
 
   return (
     <Dialog open={open} onClose={handleClose} fullWidth>
@@ -49,7 +52,7 @@ const FollowModal: React.FC<FollowModalProps> = ({ open, handleClose, loading, f
             (followers && followers.length > 0) ?
               <List>
                 {followers.map((value) => (
-                  <ListUser key={value.follower.id} user={value.follower} />
+                  <FollowListUser key={value.follower.id} user={value.follower} goToUser={goToUser} />
                 ))}
               </List> :
               <p>no followers</p>
@@ -57,43 +60,13 @@ const FollowModal: React.FC<FollowModalProps> = ({ open, handleClose, loading, f
             (following && following.length > 0) ?
               <List>
                 {following.map((value) => (
-                  <ListUser key={value.followsTo.id} user={value.followsTo} />
+                  <FollowListUser key={value.followsTo.id} user={value.followsTo} goToUser={goToUser} />
                 ))}
               </List> :
               <p>no following</p>
           )}
       </DialogContent>
     </Dialog>
-  );
-};
-
-const ListUser: React.FC<{ user: { username: string, name: string } }> = ({ user }) => {
-  return (
-    <>
-      <ListItem alignItems="flex-start">
-        <ListItemAvatar>
-          <Avatar
-            style={{ textDecoration: 'none' }}>
-            {user.username.substring(0, 1).toUpperCase()}
-          </Avatar>
-        </ListItemAvatar>
-        <ListItemText
-          primary={user.username}
-          secondary={
-            <>
-              <Typography
-                component="span"
-                variant="body2"
-                color="textPrimary"
-              >
-                {user.name}
-              </Typography>
-            </>
-          }
-        />
-      </ListItem>
-      <Divider variant="inset" component="li" />
-    </>
   );
 };
 
