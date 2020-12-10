@@ -72,7 +72,6 @@ export class MessageResolver {
     @Arg('options', { validate: true, nullable: true, defaultValue: { offset: 0, limit: 10 } }) options: OffsetLimitInput
   ): Promise<PaginatedMessages | undefined> {
     const realLimit = options.limit + 1;
-
     if (currentUser) {
       // Gets users that currentUser is following
       const followsTo = await Follow
@@ -81,20 +80,27 @@ export class MessageResolver {
         .where('follow.follower = :id', { id: currentUser.id })
         .getMany();
 
-      // Gets followed users messages
-      const messages = await Message
-        .createQueryBuilder('message')
-        .offset(options.offset)
-        .limit(realLimit)
-        .leftJoinAndSelect('message.user', 'user')
-        .where('user.id IN (:...ids)', { ids: followsTo.map((follow) => follow.followsTo.id) })
-        .orderBy('message.createdAt', 'DESC')
-        .getMany();
+      // Gets followed users messages if following people
+      if (followsTo.length) {
+        const messages = await Message
+          .createQueryBuilder('message')
+          .offset(options.offset)
+          .limit(realLimit)
+          .leftJoinAndSelect('message.user', 'user')
+          .where('user.id IN (:...ids)', { ids: followsTo.map((follow) => follow.followsTo.id) })
+          .orderBy('message.createdAt', 'DESC')
+          .getMany();
 
-      return {
-        messages: messages.slice(0, options.limit),
-        hasMore: realLimit === messages.length
-      };
+        return {
+          messages: messages.slice(0, options.limit),
+          hasMore: realLimit === messages.length
+        };
+      } else {
+        return {
+          messages: [],
+          hasMore: false
+        };
+      }
     }
     return undefined;
   }

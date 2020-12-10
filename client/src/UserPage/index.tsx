@@ -8,6 +8,7 @@ import { useStateValue } from '../state';
 import storage from '../storage';
 
 import UserProfile from './UserProfile';
+import UserProfileSkeleton from './UserProfileSkeleton';
 import SendMessage from '../components/SendMessage';
 import Messages from '../components/Messages';
 
@@ -38,6 +39,7 @@ const UserPage: React.FC<UserPageProps> = ({ user, username }) => {
         authorization: `bearer ${token}`
       }
     },
+    fetchPolicy: 'no-cache'
   });
   const [offset, setOffset] = useState(0);
   const [userMessages, setUserMessages] = useState<MessageData & { loading: boolean }>({
@@ -107,12 +109,15 @@ const UserPage: React.FC<UserPageProps> = ({ user, username }) => {
       maxWidth="sm"
       disableGutters>
       <Paper variant="outlined" square>
-        <UserProfile
-          user={data?.user}
-          owner={username === user?.username}
-          logout={logout}
-          token={token}
-        />
+        {(!loading && data?.user) ?
+          <UserProfile
+            user={data.user}
+            owner={username === user?.username}
+            logout={logout}
+            token={token}
+          /> :
+          <UserProfileSkeleton />
+        }
         <Divider variant="middle" light />
         {(username === user?.username) &&
           <SendMessage addMessage={addMessage} token={token} />

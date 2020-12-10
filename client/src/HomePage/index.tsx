@@ -3,36 +3,39 @@ import { useApolloClient } from '@apollo/client';
 
 import { useStateValue } from '../state';
 import { User, Message, MessageData } from '../types';
-import { ALL_MESSAGES } from '../queries/messageQueries';
+import { ALL_MESSAGES, FOLLOW_MESSAGES } from '../queries/messageQueries';
 
 import SendMessage from '../components/SendMessage';
 import Messages from '../components/Messages';
 
-import { Box, Container, createStyles, Divider, makeStyles, Paper, Theme, Typography, } from '@material-ui/core';
-import { Message as MessageIcon } from '@material-ui/icons';
+import {
+  Box,
+  Container,
+  Divider,
+  Paper,
+  Tab,
+  Tabs,
+  Typography,
+} from '@material-ui/core';
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    messageIcon: {
-      marginRight: theme.spacing(1),
-      color: theme.palette.primary.main
-    }
-  }),
-);
+enum TabEnum {
+  AllMessages = 0,
+  FollowMessages = 1
+}
 
 const HomePage: React.FC<{ user: User | null }> = ({ user }) => {
   const [token] = useStateValue();
   const client = useApolloClient();
   const [offset, setOffset] = useState(0);
+  const [value, setValue] = useState(0);
   const [allMessages, setAllMessages] = useState<MessageData & { loading: boolean }>({
     messages: [],
     hasMore: true,
     loading: true
   });
-  const classes = useStyles();
 
   useEffect(() => {
-    const fetchMessage = async () => {
+    const fetchAllMessage = async () => {
       const { data, loading } = await client.query<{ allMessages: MessageData }>({
         query: ALL_MESSAGES,
         variables: {
@@ -46,10 +49,33 @@ const HomePage: React.FC<{ user: User | null }> = ({ user }) => {
         loading
       }));
     };
+    const fetchFollowMessage = async () => {
+      const { data, loading } = await client.query<{ followMessages: MessageData }>({
+        query: FOLLOW_MESSAGES,
+        variables: {
+          offset
+        },
+        context: {
+          headers: {
+            authorization: `bearer ${token}`
+          }
+        },
+        fetchPolicy: 'no-cache'
+      });
+      setAllMessages((prevMessages) => ({
+        messages: prevMessages.messages.concat(data.followMessages.messages),
+        hasMore: data.followMessages.hasMore,
+        loading
+      }));
+    };
     if (allMessages.hasMore) {
-      void fetchMessage();
+      if (value === TabEnum.AllMessages) {
+        void fetchAllMessage();
+      } else {
+        void fetchFollowMessage();
+      }
     }
-  }, [offset]);
+  }, [offset, value]);
 
   const addMessage = (message: Message) => {
     setAllMessages(prevAllMessages => ({
@@ -61,6 +87,16 @@ const HomePage: React.FC<{ user: User | null }> = ({ user }) => {
   const getMore = () => {
     setOffset(prevOffeset => prevOffeset + 5);
     setAllMessages(prevAllMessages => ({ ...prevAllMessages, loading: true }));
+  };
+
+  const tabChange = (_event: React.ChangeEvent<unknown>, newValue: number) => {
+    setOffset(0);
+    setAllMessages({
+      messages: [],
+      hasMore: true,
+      loading: true
+    });
+    setValue(newValue);
   };
 
   return (
@@ -84,12 +120,15 @@ const HomePage: React.FC<{ user: User | null }> = ({ user }) => {
           </>
         }
         <Divider />
-        <Box display="flex" justifyContent="center" alignItems="center" padding={1}>
-          <MessageIcon className={classes.messageIcon} />
-          <Typography variant="h6" color="primary">
-            All messages
-          </Typography>
-        </Box>
+        <Tabs
+          value={value}
+          onChange={tabChange}
+          indicatorColor="primary"
+          textColor="primary"
+          variant="fullWidth">
+          <Tab label="All messages" />
+          {token && <Tab label="Followed messages" />}
+        </Tabs>
       </Paper>
       <Messages
         messages={allMessages.messages}

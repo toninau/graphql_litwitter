@@ -1,8 +1,12 @@
 import { gql } from '@apollo/client';
 
-/* export const FOLLOW = gql`
-
-`; */
+export const FOLLOW = gql`
+  mutation followUser($id: Int!) {
+    followUser(id: $id) {
+      followedAt
+    }
+  }
+`;
 
 export const FOLLOWS_TO = gql`
   query followsTo($id: Int!) {
