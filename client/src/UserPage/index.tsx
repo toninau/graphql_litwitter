@@ -12,17 +12,7 @@ import UserProfileSkeleton from './UserProfileSkeleton';
 import SendMessage from '../components/SendMessage';
 import Messages from '../components/Messages';
 
-import { Box, Container, createStyles, Divider, makeStyles, Paper, Theme, Typography } from '@material-ui/core';
-import { Message as MessageIcon } from '@material-ui/icons';
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    messageIcon: {
-      marginRight: theme.spacing(1),
-      color: theme.palette.primary.main
-    }
-  }),
-);
+import { Container, Divider, Paper, Tabs, Tab } from '@material-ui/core';
 
 interface UserPageProps {
   user: User | null;
@@ -47,7 +37,6 @@ const UserPage: React.FC<UserPageProps> = ({ user, username }) => {
     hasMore: true,
     loading: true
   });
-  const classes = useStyles();
 
   const fetchMessage = async (offset: number) => {
     const { data, loading } = await client.query<{ messages: MessageData }>({
@@ -123,16 +112,17 @@ const UserPage: React.FC<UserPageProps> = ({ user, username }) => {
           <SendMessage addMessage={addMessage} token={token} />
         }
         <Divider />
-        <Box display="flex" justifyContent="center" alignItems="center" padding={1}>
-          <MessageIcon className={classes.messageIcon} />
-          <Typography variant="h6" color="primary">
-            Messages
-          </Typography>
-        </Box>
+        <Tabs
+          value={0}
+          indicatorColor="primary"
+          textColor="primary"
+          variant="fullWidth">
+          <Tab label="messages" />
+        </Tabs>
       </Paper>
       <Messages
-        messages={userMessages.messages}
-        loading={userMessages.loading}
+        messages={!loading ? userMessages.messages : []}
+        loading={loading || userMessages.loading}
         hasMore={userMessages.hasMore}
         getMore={getMore}
       />
