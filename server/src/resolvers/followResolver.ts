@@ -70,4 +70,27 @@ export class FollowResolver {
     }
     return undefined;
   }
+
+  @Mutation(() => Boolean)
+  @UseMiddleware(authChecker)
+  async unfollowUser(
+    @Arg('id', () => Int) id: number,
+    @Ctx() { currentUser }: MyContext
+  ): Promise<boolean> {
+    try {
+      const result = await Follow
+        .createQueryBuilder()
+        .delete()
+        .from(Follow)
+        .where('follower = :id', { id: currentUser.id })
+        .andWhere('followsTo = :id2', { id2: id })
+        .execute();
+      if (!result.affected) {
+        return false;
+      }
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
 }

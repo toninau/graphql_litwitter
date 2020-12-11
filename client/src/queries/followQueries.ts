@@ -8,6 +8,12 @@ export const FOLLOW = gql`
   }
 `;
 
+export const UNFOLLOW = gql`
+  mutation unfollowUser($id: Int!) {
+    unfollowUser(id: $id)
+  }
+`;
+
 export const FOLLOWS_TO = gql`
   query followsTo($id: Int!) {
     followsTo(id: $id) {

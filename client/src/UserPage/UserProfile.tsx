@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 
 import { UserWithExtra, User, Follower, FollowsTo } from '../types';
 import { UPDATE_USER } from '../queries/userQueries';
-import { FOLLOWERS, FOLLOWS_TO, FOLLOW } from '../queries/followQueries';
+import { FOLLOWERS, FOLLOWS_TO, FOLLOW, UNFOLLOW } from '../queries/followQueries';
 
 import UserModal from './UserModal';
 import FollowModal from './FollowModal';
@@ -53,6 +53,7 @@ const UserProfile: React.FC<ProfileProps> = ({ user, owner, logout, token }) => 
   const [openFollowsToModal, setOpenFollowsToModal] = useState(false);
   const [updateUser] = useMutation<{ updateUser: User }>(UPDATE_USER);
   const [followUser] = useMutation(FOLLOW);
+  const [unfollowUser] = useMutation(UNFOLLOW);
   const [getFollowers, { loading, data }] = useLazyQuery<{ followers: Follower[] }>(FOLLOWERS, {
     fetchPolicy: 'no-cache'
   });
@@ -130,7 +131,26 @@ const UserProfile: React.FC<ProfileProps> = ({ user, owner, logout, token }) => 
           console.log(error);
         }
       } else {
-        console.log('unfollow');
+        try {
+          await unfollowUser({
+            context: {
+              headers: {
+                authorization: `bearer ${token}`
+              },
+            },
+            variables: {
+              id: stateUser.id
+            },
+            fetchPolicy: 'no-cache'
+          });
+          setStateUser(prevState => ({
+            ...prevState,
+            following: false,
+            followersCount: prevState.followersCount - 1
+          }));
+        } catch (error) {
+          console.log(error);
+        }
       }
     } else {
       if (window.confirm('You have to be logged in to follow someone, proceed to login page?')) {
