@@ -4,7 +4,7 @@
 
 Currently running on:
 * front-end: https://litetwitter.netlify.app/
-* back-end: https://litetwitter.herokuapp.com/
+* back-end: https://litetwitter.herokuapp.com/ (it takes a while for the back-end to start)
 
 Lite Twitter is minimal twitter clone where you can:
 1. Create an account or log in to existing account
