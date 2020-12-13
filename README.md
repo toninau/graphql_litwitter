@@ -2,11 +2,17 @@
 
 > All the basic functionalities work, a lighter version of twitter.
 
+Currently running on:
+* front-end: https://litetwitter.netlify.app/
+* back-end: https://litetwitter.herokuapp.com/
+
 Lite Twitter is minimal twitter clone where you can:
 1. Create an account or log in to existing account
 2. Read all messages or just one user's messages
-3. Send messages
-4. Update profile information
+3. Follow users
+4. Read messages by followed users
+5. Send messages
+6. Update profile information
 
 ## About
 
