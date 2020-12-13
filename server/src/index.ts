@@ -5,25 +5,34 @@ import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
 import cors from 'cors';
 import { verify } from 'jsonwebtoken';
+import path from 'path';
 
 import { MessageResolver } from './resolvers/messageResolver';
 import { UserResolver } from './resolvers/userResolver';
 import { FollowResolver } from './resolvers/followResolver';
 
 import { User } from './entity/User';
+import { Follow } from './entity/Follow';
+import { Message } from './entity/Message';
 import { TokenInterface } from './types';
 
 const SECRET = process.env.SECRET || 'TEMP_VALUE';
 const PORT = process.env.PORT || '4000';
 
 const main = async () => {
-  await createConnection();
+  const conn = await createConnection({
+    type: 'postgres',
+    url: process.env.DATABASE_URL,
+    migrations: [path.join(__dirname, './migration/*')],
+    entities: [User, Follow, Message]
+  });
 
-  // await conn.runMigrations();
+  await conn.runMigrations();
 
   const app = express();
   app.set('trust proxy', 1);
   app.use(cors());
+  app.get('/', (_req, res) => res.send('testing'));
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
