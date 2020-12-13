@@ -21,7 +21,7 @@ const Messages: React.FC<MessagesProps> = ({ messages, loading, hasMore, getMore
           <Message key={message.id} message={message} />
         ))}
         {(messages && loading) &&
-          Array(5).fill(0).map((_value, index) => (
+          Array(15).fill(0).map((_value, index) => (
             <SkeletonMessage key={index} />
           ))
         }
