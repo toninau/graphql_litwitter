@@ -8,9 +8,9 @@ import {
 interface TextProps {
   label: string;
   type: 'text' | 'password';
-  placeholder: string;
   name: string;
-  variant?: 'outlined' | 'filled';
+  placeholder?: string;
+  variant?: 'outlined' | 'filled' | 'standard';
   size?: 'small' | 'medium';
   multiline?: boolean;
   rows?: number;

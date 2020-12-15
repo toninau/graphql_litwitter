@@ -41,7 +41,6 @@ const AccountForm: React.FC<AccountProps> = ({ handleSubmit, loading }) => {
                   label="Username"
                   name="username"
                   type="text"
-                  placeholder="MrPotatio"
                   variant="outlined"
                   size="small"
                 />
@@ -49,7 +48,6 @@ const AccountForm: React.FC<AccountProps> = ({ handleSubmit, loading }) => {
                   label="Password"
                   name="password"
                   type="password"
-                  placeholder="s3cr3t"
                   variant="outlined"
                   size="small"
                 />

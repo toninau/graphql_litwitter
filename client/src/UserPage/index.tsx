@@ -22,7 +22,7 @@ interface UserPageProps {
 const UserPage: React.FC<UserPageProps> = ({ user, username }) => {
   const [token, setToken] = useStateValue();
   const client = useApolloClient();
-  const { loading, data } = useQuery<{ user: UserWithExtra }>(FETCH_USER, {
+  const { loading, data, error } = useQuery<{ user: UserWithExtra }>(FETCH_USER, {
     variables: { username: username },
     context: {
       headers: {
@@ -86,7 +86,7 @@ const UserPage: React.FC<UserPageProps> = ({ user, username }) => {
     setOffset(prevOffeset => prevOffeset + 5);
   };
 
-  if (!loading && !data?.user) {
+  if (!loading && error) {
     return (
       <p>user does not exist</p>
     );

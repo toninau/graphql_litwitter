@@ -66,7 +66,7 @@ const SendMessage: React.FC<SendMessageProps> = ({ token, addMessage }) => {
       <div>
         <div style={{ margin: '16px' }}>
           <InputBase
-            placeholder="whats happening?"
+            placeholder="What's happening?"
             fullWidth
             multiline
             value={input}
