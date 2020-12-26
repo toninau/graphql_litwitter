@@ -27,7 +27,7 @@ const HomePage: React.FC<{ user: User | null }> = ({ user }) => {
   const [token] = useStateValue();
   const client = useApolloClient();
   const [offset, setOffset] = useState(0);
-  const [value, setValue] = useState(0);
+  const [tab, setTab] = useState(TabEnum.AllMessages);
   const [allMessages, setAllMessages] = useState<MessageData & { loading: boolean }>({
     messages: [],
     hasMore: true,
@@ -69,19 +69,21 @@ const HomePage: React.FC<{ user: User | null }> = ({ user }) => {
       }));
     };
     if (allMessages.hasMore) {
-      if (value === TabEnum.AllMessages) {
+      if (tab === TabEnum.AllMessages) {
         void fetchAllMessage();
       } else {
         void fetchFollowMessage();
       }
     }
-  }, [offset, value]);
+  }, [offset, tab]);
 
   const addMessage = (message: Message) => {
-    setAllMessages(prevAllMessages => ({
-      ...prevAllMessages,
-      messages: [message, ...prevAllMessages.messages]
-    }));
+    if (tab === TabEnum.AllMessages) {
+      setAllMessages(prevAllMessages => ({
+        ...prevAllMessages,
+        messages: [message, ...prevAllMessages.messages]
+      }));
+    }
   };
 
   const getMore = () => {
@@ -96,7 +98,7 @@ const HomePage: React.FC<{ user: User | null }> = ({ user }) => {
       hasMore: true,
       loading: true
     });
-    setValue(newValue);
+    setTab(newValue);
   };
 
   return (
@@ -121,7 +123,7 @@ const HomePage: React.FC<{ user: User | null }> = ({ user }) => {
         }
         <Divider />
         <Tabs
-          value={value}
+          value={tab}
           onChange={tabChange}
           indicatorColor="primary"
           textColor="primary"
