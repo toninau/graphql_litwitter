@@ -23,7 +23,8 @@ const main = async () => {
     type: 'postgres',
     url: config.URL,
     migrations: [path.join(__dirname, './migration/*')],
-    entities: [User, Follow, Message]
+    entities: [User, Follow, Message],
+    ssl: true
   });
 
   await conn.runMigrations();
