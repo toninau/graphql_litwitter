@@ -39,6 +39,57 @@ PostgreSQL is used as database.
 
 Client is initialized with create-react-app using TypeScript template. Client uses react, material ui, react-router-dom, formik and apollo client.
 
+### ENV setup
+
+Create .env file to the root of the client folder.
+Requires URI to GraphQL API.
+
+>example
+
+```
+REACT_APP_API_URI=http://localhost:4000/graphql 
+```
+
 ## Server
 
 Server provides GraphQL API. Server uses express, typeorm, typegraphql, apollo-server-express, argon2 and jsonwebtoken.
+
+### ENV setup
+
+Create .env file to the root of the server folder.
+Requires database URI that contains:
+- user
+- password
+- host
+- database name
+
+also requires port and secret.
+
+>example
+
+```
+DATABASE_URL=postgres://postgres:root@localhost:5432/chat
+PORT=4000
+SECRET="kB1jlAl4kfjl_kPf32l"
+```
+
+## Running locally
+
+### Server
+
+```
+cd graphql_litwitter/server
+npm install
+(ENV needs to set up at this point)
+npm run tsc
+npm start
+```
+
+### Client
+
+```
+cd graphql_litwitter/client
+npm install
+(ENV needs to set up at this point)
+npm start
+```
