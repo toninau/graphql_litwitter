@@ -19,6 +19,8 @@ import { User } from '../entity/User';
 import { registerValidation } from '../utils/registerValidation';
 import { Follow } from '../entity/Follow';
 
+import config from '../utils/config';
+
 @InputType()
 export class UsernamePasswordInput {
   @Field()
@@ -52,8 +54,6 @@ class UserWithExtra extends User {
   @Field()
   following!: boolean;
 }
-
-const SECRET = process.env.SECRET || 'TEMP_VALUE';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -154,7 +154,7 @@ export class UserResolver {
     };
 
     return {
-      value: sign(userForToken, SECRET)
+      value: sign(userForToken, config.SECRET)
     };
   }
 
@@ -187,7 +187,7 @@ export class UserResolver {
     };
 
     return {
-      value: sign(userForToken, SECRET)
+      value: sign(userForToken, config.SECRET)
     };
   }
 }

@@ -16,13 +16,12 @@ import { Follow } from './entity/Follow';
 import { Message } from './entity/Message';
 import { TokenInterface } from './types';
 
-const SECRET = process.env.SECRET || 'TEMP_VALUE';
-const PORT = process.env.PORT || '4000';
+import config from './utils/config';
 
 const main = async () => {
   const conn = await createConnection({
     type: 'postgres',
-    url: process.env.DATABASE_URL,
+    url: config.URL,
     migrations: [path.join(__dirname, './migration/*')],
     entities: [User, Follow, Message]
   });
@@ -44,7 +43,7 @@ const main = async () => {
       if (auth && auth.toLowerCase().startsWith('bearer ')) {
         try {
           const decodedToken = verify(
-            auth.substring(7), SECRET
+            auth.substring(7), config.SECRET
           );
           const currentUser = await User.findOne((decodedToken as TokenInterface).id);
           return { currentUser };
@@ -61,8 +60,8 @@ const main = async () => {
     cors: false
   });
 
-  app.listen(parseInt(PORT), () => {
-    console.log(`Server ready at ${PORT}`);
+  app.listen(parseInt(config.PORT), () => {
+    console.log(`Server ready at ${config.PORT}`);
   });
 };
 
