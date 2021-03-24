@@ -24,7 +24,9 @@ const main = async () => {
     url: config.URL,
     migrations: [path.join(__dirname, './migration/*')],
     entities: [User, Follow, Message],
-    ssl: true
+    ssl: {
+      rejectUnauthorized: false,
+    }
   });
 
   await conn.runMigrations();
