@@ -9,7 +9,7 @@ import App from './App';
 import { StateProvider } from './state';
 
 const client = new ApolloClient({
-  uri: 'https://litetwitter.herokuapp.com/graphql',
+  uri: process.env.REACT_APP_API_URI,
   cache: new InMemoryCache()
 });
 
