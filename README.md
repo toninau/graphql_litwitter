@@ -1,9 +1,7 @@
 # Lite Twitter
 
-> All the basic functionalities work, a lighter version of twitter.
-
 Currently running on:
-* front-end: https://litetwitter.netlify.app/
+* front-end: https://litetwitter.netlify.app/home
 * back-end: https://litetwitter.herokuapp.com/ (it takes a while for the back-end to start)
 
 Lite Twitter is minimal twitter clone where you can:
